@@ -25,9 +25,10 @@ class App extends Component {
     var self = this
 
     var {host, port} = Config.networks[process.env.NODE_ENV]
-    const provider = (typeof window.web3 == 'undefined')?
+    const provider = (window.web3 === null)?
                       new Web3.providers.HttpProvider('http://' + host + ':' + port)
                       : window.web3.currentProvider
+                      // const provider = new Web3.providers.HttpProvider('http://' + host + ':' + port)
     const contract = require('truffle-contract')
     const peerCoin = contract(PeerCoinContract)
     peerCoin.setProvider(provider)

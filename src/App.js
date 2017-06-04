@@ -70,26 +70,22 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <h1>BeerBot</h1>
+        <p>Never forget who owes you a beer!</p>
+        <nav className="navbar pure-menu pure-menu-horizontal">
+            <ul className="pure-menu-list">
+                <li className="pure-menu-item"><a href="#" className="pure-menu-link">News</a></li>
+                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Sports</a></li>
+                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Finance</a></li>
+            </ul>
+        </nav>
         <div>
-          <h1>Create Group:</h1>
           <input placeholder={'Group Name'} value={this.state.groupNameInput} onChange={this.setInputGroup}/>
           <input placeholder={'Group ID'} value={this.state.groupIdInput} onChange={this.setInputId}/>
           <button onClick={this.createGroup}>Create Group</button>
         </div>
       </div>
     )
-    // <table>
-    // <thead>
-    // <tr>
-    // <th>First Name</th>
-    // <th>Last Name</th>
-    // <th>Age</th>
-    // </tr>
-    // </thead>
-    // <tbody>
-    // {peerCoin}
-    // </tbody>
-    // </table>
   }
 }
 

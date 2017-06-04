@@ -9,12 +9,15 @@ class App extends Component {
     super(props)
 
     this.createGroup = this.createGroup.bind(this)
+    this.listYourGroups = this.listYourGroups.bind(this)
     this.setInputId = this.setInputId.bind(this)
     this.setInputGroup = this.setInputGroup.bind(this)
 
     this.state = {
       groupNameInput: '',
-      groupIdInput: ''
+      groupIdInput: '',
+      groupIDs: [],
+      groupNames: []
     }
   }
 
@@ -44,9 +47,39 @@ class App extends Component {
       peerCoin.deployed().then(function(instance) {
         peerCoinInstance = instance
         console.log('adding',self.state.groupIdInput, self.state.groupNameInput)
-        return peerCoinInstance.addGroup(self.state.groupIdInput, self.state.groupNameInput, {from: accounts[0]})
+        return peerCoinInstance.createGroup(self.state.groupIdInput, self.state.groupNameInput, {from: accounts[0]})
       }).then(function(a) {
         peerCoinInstance.getGroupName(self.state.groupIdInput).then(function(result) {
+          console.log( window.web3.toAscii(result))
+        })
+      })
+    })
+    console.log('after get accounts')
+  }
+  listYourGroups() {
+    console.log('LIST YOUR GROUPS')
+    var self = this
+
+    var {host, port} = Config.networks[process.env.NODE_ENV]
+    const provider = (typeof window.web3 == 'undefined')?
+                      new Web3.providers.HttpProvider('http://' + host + ':' + port)
+                      : window.web3.currentProvider
+    const contract = require('truffle-contract')
+    const peerCoin = contract(PeerCoinContract)
+    peerCoin.setProvider(provider)
+
+    const web3RPC = new Web3(provider)
+
+    var peerCoinInstance
+
+    console.log('before get accounts')
+    web3RPC.eth.getAccounts(function(error, accounts) {
+      console.log('in get accounts', accounts)
+      peerCoin.deployed().then(function(instance) {
+        peerCoinInstance = instance
+
+        peerCoinInstance.getGroupName(accounts[0]).then(function(result) {
+          console.log('working')
           console.log( window.web3.toAscii(result))
         })
       })
@@ -69,6 +102,12 @@ class App extends Component {
   }
 
   render() {
+    const groups = this.state.groupIDs.map((gID, i) =>
+      <tr key={i}>
+        <td>{gID}</td>
+        <td>{this.state.groupNames[i]}</td>
+      </tr>
+    )
     return (
       <div className="App">
         <h1>BeerBot</h1>
@@ -84,6 +123,18 @@ class App extends Component {
           <input placeholder={'Group Name'} value={this.state.groupNameInput} onChange={this.setInputGroup}/>
           <input placeholder={'Group ID'} value={this.state.groupIdInput} onChange={this.setInputId}/>
           <button onClick={this.createGroup}>Create Group</button>
+          <button onClick={this.listYourGroups}>List Groups</button>
+          <table>
+            <thead>
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groups}
+            </tbody>
+          </table>
         </div>
       </div>
     )

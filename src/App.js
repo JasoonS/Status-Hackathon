@@ -18,20 +18,12 @@ class App extends Component {
   }
 
   componentWillMount() {
-    /*
-     * SMART CONTRACT EXAMPLE
-     *
-     * Normally these functions would be called in the context of a
-     * state management library, but for convenience I've placed them here.
-     */
-
-    // So we can update state later.
     var self = this
 
-    // Get the RPC provider and setup our SimpleStorage contract.
     var {host, port} = Config.networks[process.env.NODE_ENV]
-    
-    const provider = new Web3.providers.HttpProvider('http://' + host + ':' + port)
+    const provider = (typeof window.web3 == 'undefined')?
+                      new Web3.providers.HttpProvider('http://' + host + ':' + port)
+                      : window.web3.currentProvider
     const contract = require('truffle-contract')
     const simpleStorage = contract(SimpleStorageContract)
     simpleStorage.setProvider(provider)

@@ -18,7 +18,8 @@ class App extends Component {
 
     this.state = {
       groupNameInput: '',
-      groupIdInput: ''
+      groupIdInput: '',
+      pageId: 'home'
     }
   }
 
@@ -76,28 +77,26 @@ class App extends Component {
         <div className="App test">
         <nav className="navbar pure-menu pure-menu-horizontal">
           <a href="#" className="pure-menu-heading pure-menu-link">BeerBot</a>
-          {
-          }<ul className="pure-menu-list">
+          <ul className="pure-menu-list">
               <li className="pure-menu-item"><a href="#" className="pure-menu-link">Groups</a></li>
               <li className="pure-menu-item"><a href="#" className="pure-menu-link">Tokens</a></li>
               <li className="pure-menu-item"><a href="#" className="pure-menu-link">FAQ</a></li>
-              </ul>
-          }
+          </ul>
           </nav>
-          <main className="container">
-              <div className="pure-g">
-                <div className="pure-u-1-1">
-                  <p>
-                    BeerBot manages a bet or an exchange between you and your friends.
-                  </p>
-                  <div>
-                    <input placeholder={'Group Name'} value={this.state.groupNameInput} onChange={this.setInputGroup}/>
-                    <input placeholder={'Group ID'} value={this.state.groupIdInput} onChange={this.setInputId}/><br/>
-                    <button onClick={this.createGroup}>Create Group</button>
+            <main className="container">
+                <div className="pure-g">
+                  <div className="pure-u-1-1">
+                    <p>
+                      BeerBot manages a bet or an exchange between you and your friends.
+                    </p>
+                    <div>
+                      <input placeholder={'Group Name'} value={this.state.groupNameInput} onChange={this.setInputGroup}/>
+                      <input placeholder={'Group ID'} value={this.state.groupIdInput} onChange={this.setInputId}/><br/>
+                      <button onClick={this.createGroup}>Create Group</button>
+                    </div>
                   </div>
                 </div>
-              </div>
-          </main>
+            </main>
         </div>);
   }
 }

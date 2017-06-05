@@ -38,6 +38,7 @@
     "promise": "7.1.1",
     "react-dev-utils": "^0.4.2",
     "recursive-readdir": "2.1.0",
+    "redux-devtools": "^3.4.0",
     "status-dev-cli": "^3.2.8",
     "strip-ansi": "3.0.1",
     "style-loader": "0.13.1",
@@ -51,8 +52,12 @@
   },
   "dependencies": {
     "dotenv": "^2.0.0",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react": "^15.5.4",
+    "react-bootstrap": "^0.31.0",
+    "react-dom": "^15.5.4",
+    "react-redux": "^5.0.5",
+    "react-router": "^4.1.1",
+    "redux": "^3.6.0"
   },
   "scripts": {
     "start": "node scripts/start.js",

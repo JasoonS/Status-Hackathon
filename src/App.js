@@ -2,6 +2,10 @@ import React, { Component } from 'react'
 import PeerCoinContract from '../build/contracts/PeerCoin.json'
 import Config from '../truffle.js'
 import Web3 from 'web3'
+
+import './css/oswald.css'
+import './css/open-sans.css'
+import './css/pure-min.css'
 import './App.css'
 
 class App extends Component {

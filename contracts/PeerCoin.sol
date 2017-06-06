@@ -1,17 +1,24 @@
 pragma solidity ^0.4.8;
 
-import "./util/SafeMath.sol";
-
 contract PeerCoin {
+
+  event GroupGet(
+    address indexed _from,
+    bytes32 indexed _name,
+    bytes32 indexed _id,
+    int _ballance
+  );
+
   struct Group {
-    /*mapping (address => int) ballances;*/
+    mapping (address => int) ballances;
+    // mppping (address => bool) isMember; //test if person is a member of the group
     address[] members; //an array to easily iterate through the members
     /*mapping (bytes32 => GroupBets) ballances;*/
     /*bytes32[] members; //an array to easily iterate through the bets*/
     bytes32 name;
     bool exists;
   }
-  /*struct GroupBets {
+  struct GroupBets {
     mapping (address => Bet) bets;
     address[] participants;
     bytes32 name;
@@ -22,34 +29,34 @@ contract PeerCoin {
     bool stance;
     uint amount;
     bool exists;
-  }*/
+  }
   struct User {
     bytes32[] groups;
     bytes32[] groupBets;
     bool exists;
   }
 
-  mapping (bytes32 => Group) groups;
-  mapping (address => User) users;
+  mapping (bytes32 => Group) public groups;
+  mapping (address => User) public users;
 
-  function createGroup (bytes32 id, bytes32 name) returns (bool success){
-    if(!groups[id].exists) {
+  function createGroup (bytes32 gname, bytes32 gid) {
+    /*if(!groups[id].exists) {*/
       //create group
       Group memory newGroup;
 
-      newGroup.name = name;
+      newGroup.name = gname;
       newGroup.exists = true;
 
-      groups[id] = newGroup;
-      groups[id].members.push(msg.sender);
+      groups[gid] = newGroup;
+      groups[gid].members.push(msg.sender);
 
       // Add group to the users list of groups
-      /*addToUsersGroup(id);*/
+      addToUsersGroup(gid);
 
-      return true;
+      /*return true;
     } else {
       return false;
-    }
+    }*/
   }
 
   function addToUsersGroup (bytes32 id) internal {
@@ -60,33 +67,49 @@ contract PeerCoin {
   }
 
   // TODO: Add balance int[] as a return types
-  function listGroups(address askAddress) constant returns (bytes32[],bytes32[]) {
+  function listGroups() constant returns (bytes32[],bytes32[],int[]) {
+//   function listGroups() constant returns (uint length) {
     /*uint length = people.length;*/
-    uint length = users[askAddress].groups.length;
+    uint length = users[msg.sender].groups.length;
 
     bytes32[] memory groupIds = new bytes32[](length);
     bytes32[] memory groupNames = new bytes32[](length);
-    /*int[] memory ballances = new int[](length);*/
+    int[] memory ballances = new int[](length);
 
     // This for loop isn't too expensive because this function is 'constart'
     for (uint i = 0; i < length; i++) {
-      bytes32 curGroupId = users[askAddress].groups[i];
+      bytes32 curGroupId = users[msg.sender].groups[i];
       Group memory curGroup;
       curGroup = groups[curGroupId];
 
       groupIds[i] = curGroupId;
       groupNames[i] = curGroup.name;
-      /*ballances[i] = curGroup.ballances[msg.sender];*/
+      ballances[i] = groups[curGroupId].ballances[msg.sender];
+      GroupGet(msg.sender, curGroup.name, curGroupId, ballances[i]);
     }
-    return (groupIds, groupNames);
+    return (groupIds, groupNames,ballances);
   }
 
-  function getGroupName(bytes32 id) constant returns (bytes32 name) {
-    if(!groups[id].exists)
-      throw;
-
-    return groups[id].name;
+  function sendToken(address toAdr, bytes32 gid, uint amount) returns (int ballance){
+    groups[gid].ballances[msg.sender] = groups[gid].ballances[msg.sender] - int(amount);
+    groups[gid].ballances[toAdr] = groups[gid].ballances[toAdr] + int(amount);
+    return groups[gid].ballances[msg.sender];
   }
+
+  function getBallance(bytes32 gid) constant returns (int balance) {
+      return groups[gid].ballances[msg.sender];
+  }
+
+  //for debugging:
+  function getSenderAddress() constant returns (address) {
+      return msg.sender;
+  }
+
+//   function getGroupName(bytes32 id) constant returns (bytes32 name) {
+//     if(!groups[id].exists)
+//       throw;
+//     return groups[id].name;
+//   }
 }
 
 /*sudo apt-get install software-properties-common

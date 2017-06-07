@@ -7,7 +7,6 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin(); // something material ui needs...
 import thunk from 'redux-thunk';
 
-import web3Redux from './src/reducer';
 import reducer from './reducer'
 
 import App from './App';

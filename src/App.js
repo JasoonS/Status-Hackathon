@@ -43,7 +43,7 @@ class App extends Component {
       <div id="outer-container" style={{height: '100%'}}>
         <SideBar/>
         <main id="page-wrap">
-          {displayMainWindow()}  
+          {displayMainWindow()}
         </main>
       </div>
     )

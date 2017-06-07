@@ -23,7 +23,7 @@ class App extends Component {
     const displayMainWindow = () => {
       console.log("you are on screen:", this.props.screen)
       if (this.props.screen == 0)
-        return <Home  />
+        return <Home />
       else if(this.props.screen == 1)
           return <HowItWorks />
       else if(this.props.screen == 2)
@@ -38,11 +38,21 @@ class App extends Component {
           return <BotInstructions />
     }
     return (
-      <div>
+      // <a className={classNames({'side-button': true, 'left': true, 'active': this.state.side === 'left'})} onClick={this.changeSide.bind(this, 'left')}>Left</a>
+      // <a className={classNames({'side-button': true, 'right': true, 'active': this.state.side === 'right'})} onClick={this.changeSide.bind(this, 'right')}>Right</a>
+      <div id="outer-container" style={{height: '100%'}}>
         <SideBar/>
-        {displayMainWindow()}
+        <main id="page-wrap">
+          {displayMainWindow()}  
+        </main>
       </div>
     )
+    // {buttons}
+    // <div id={ "outer-container" }>
+    // <SideBar/>
+    // <div id="page-wrap">
+    // </div>
+    // </div>
   }
 }
 

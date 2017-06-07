@@ -18,11 +18,11 @@ const store = createStore(
   composeEnhancers(applyMiddleware(thunk))
 );
 
+// <MuiThemeProvider>
+// </MuiThemeProvider>
 render(
   <Provider store={store}>
-    <MuiThemeProvider>
       <App />
-    </MuiThemeProvider>
   </Provider>,
   document.getElementById('root')
 );

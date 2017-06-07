@@ -1,95 +1,67 @@
 import React, { Component } from 'react'
 import PeerCoinContract from '../build/contracts/PeerCoin.json'
 import Config from '../truffle.js'
+import { connect } from 'react-redux'
 import Web3 from 'web3'
+import './App.css'
+import SideBar from './containers/SideBar.js'
+import BotInstructions from './components/BotInstructions.js'
+import HowItWorks from './components/HowItWorks.js'
+import CreateGroup from './containers/CreateGroup.js'
+import Home from './containers/Home.js'
+import MyGroups from './containers/MyGroups.js'
+import MyBets from './containers/MyBets.js'
+import Tokens from './containers/Tokens.js'
+import {createSampleGroups} from './test/testTruffle.js'
 
 class App extends Component {
   constructor(props) {
     super(props)
-
-    this.createGroup = this.createGroup.bind(this)
-    this.setInputId = this.setInputId.bind(this)
-    this.setInputGroup = this.setInputGroup.bind(this)
-
-    this.state = {
-      groupNameInput: '',
-      groupIdInput: ''
-    }
-  }
-
-  componentWillMount() {
-  }
-
-  createGroup() {
-    console.log('create group')
-    var self = this
-
-    var {host, port} = Config.networks[process.env.NODE_ENV]
-    const provider = (typeof window.web3 == 'undefined')?
-                      new Web3.providers.HttpProvider('http://' + host + ':' + port)
-                      : window.web3.currentProvider
-    const contract = require('truffle-contract')
-    const peerCoin = contract(PeerCoinContract)
-    peerCoin.setProvider(provider)
-
-    const web3RPC = new Web3(provider)
-
-    var peerCoinInstance
-
-    console.log('before get accounts')
-    web3RPC.eth.getAccounts(function(error, accounts) {
-      console.log('in get accounts', accounts)
-      peerCoin.deployed().then(function(instance) {
-        peerCoinInstance = instance
-        console.log('adding',self.state.groupIdInput, self.state.groupNameInput)
-        return peerCoinInstance.addGroup(self.state.groupIdInput, self.state.groupNameInput, {from: accounts[0]})
-      }).then(function(a) {
-        peerCoinInstance.getGroupName(self.state.groupIdInput).then(function(result) {
-          console.log( window.web3.toAscii(result))
-        })
-      })
-    })
-    console.log('after get accounts')
-  }
-
-  setInputGroup(e) {
-    this.setState({
-      ...this.state,
-      groupNameInput: e.target.value
-    })
-  }
-
-  setInputId(e) {
-    this.setState({
-      ...this.state,
-      groupIdInput: e.target.value
-    })
   }
 
   render() {
+    const displayMainWindow = () => {
+      console.log("you are on screen:", this.props.screen)
+      if (this.props.screen == 0)
+        return <Home />
+      else if(this.props.screen == 1)
+          return <HowItWorks />
+      else if(this.props.screen == 2)
+          return <MyGroups />
+      else if (this.props.screen == 3)
+        return <CreateGroup />
+      else if(this.props.screen == 4)
+          return <MyBets />
+      else if(this.props.screen == 5)
+          return <Tokens /> //TODO:: rename this to TokenInfo
+      else if(this.props.screen == 6)
+          return <BotInstructions />
+    }
     return (
-      <div className="App">
-        <div>
-          <h1>Create Group:</h1>
-          <input placeholder={'Group Name'} value={this.state.groupNameInput} onChange={this.setInputGroup}/>
-          <input placeholder={'Group ID'} value={this.state.groupIdInput} onChange={this.setInputId}/>
-          <button onClick={this.createGroup}>Create Group</button>
-        </div>
+      // <a className={classNames({'side-button': true, 'left': true, 'active': this.state.side === 'left'})} onClick={this.changeSide.bind(this, 'left')}>Left</a>
+      // <a className={classNames({'side-button': true, 'right': true, 'active': this.state.side === 'right'})} onClick={this.changeSide.bind(this, 'right')}>Right</a>
+      <div id="outer-container" style={{height: '100%'}}>
+        <SideBar/>
+        <main id="page-wrap">
+          {displayMainWindow()}  
+        </main>
       </div>
     )
-    // <table>
-    // <thead>
-    // <tr>
-    // <th>First Name</th>
-    // <th>Last Name</th>
-    // <th>Age</th>
-    // </tr>
-    // </thead>
-    // <tbody>
-    // {peerCoin}
-    // </tbody>
-    // </table>
+    // {buttons}
+    // <div id={ "outer-container" }>
+    // <SideBar/>
+    // <div id="page-wrap">
+    // </div>
+    // </div>
   }
 }
 
-export default App
+const mapStateToProps = state => {
+  const { screen } = state
+
+  return {
+    screen
+  }
+}
+
+export default connect(mapStateToProps)(App)

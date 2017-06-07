@@ -3,6 +3,7 @@ import {
 } from '../actions'
 
 const initialState = {
+  peerCoinLoaded: false,
   screen: 0
 }
 
@@ -13,6 +14,13 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         screen: action.windowNum
+      }
+    case actions.SAVE_PEER_COIN:
+      console.log('SAVE_PEER_COIN')
+      return {
+        ...state,
+        peerCoinLoaded: true,
+        peerCoinInstance: action.peerCoinInstance
       }
     default:
       return state

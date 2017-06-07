@@ -13,10 +13,17 @@ import MyGroups from './containers/MyGroups.js'
 import MyBets from './containers/MyBets.js'
 import Tokens from './containers/Tokens.js'
 import {createSampleGroups} from './test/testTruffle.js'
+import {loadPeerCoinInstance} from './actions'
 
 class App extends Component {
   constructor(props) {
     super(props)
+  }
+
+  componentWillMount() {
+    this.props.dispatch(
+      loadPeerCoinInstance()
+    )
   }
 
   render() {
@@ -29,9 +36,9 @@ class App extends Component {
       else if(this.props.screen == 2)
           return <MyGroups />
       else if (this.props.screen == 3)
-        return <CreateGroup />
+        return <MyBets />
       else if(this.props.screen == 4)
-          return <MyBets />
+        return <CreateGroup />
       else if(this.props.screen == 5)
           return <Tokens /> //TODO:: rename this to TokenInfo
       else if(this.props.screen == 6)

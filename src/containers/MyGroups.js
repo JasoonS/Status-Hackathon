@@ -4,7 +4,7 @@ export default class MyBets extends Component {
   render() {
     return (
       <div className="MyBets">
-        <h1>MyBets</h1>
+        <h1>MyGroup</h1>
       </div>
     );
   }

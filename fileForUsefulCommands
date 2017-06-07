@@ -1,6 +1,8 @@
 Please don't delete this file. It is for storing any commands that are used often.
 
 status-dev-cli scan
+status-dev-cli switch-node http://localhost:8546 --ip 10.0.0.12
+status-dev-cli switch-node http://localhost:8546 --ip 192.168.56.101
 status-dev-cli add '{"whisper-identity":"testing", "name":"test", "dapp-url":"http://10.5.50.12:8000"}' --ip 192.168.56.101
 
 

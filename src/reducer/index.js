@@ -4,7 +4,8 @@ import {
 
 const initialState = {
   peerCoinLoaded: false,
-  screen: 0
+  groupDataLoaded: false,
+  screen: 2
 }
 
 const reducer = (state = initialState, action) => {
@@ -21,6 +22,14 @@ const reducer = (state = initialState, action) => {
         ...state,
         peerCoinLoaded: true,
         peerCoinInstance: action.peerCoinInstance
+      }
+    case actions.SAVE_USER_GROUPS:
+      console.log('SAVE_USER_GROUPS')
+      console.log(action.groupData)
+      return {
+        ...state,
+        groupData: action.groupData,
+        groupDataLoaded: true
       }
     default:
       return state

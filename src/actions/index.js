@@ -27,19 +27,13 @@ export const loadPeerCoinInstance = () => {
 
 export const loadUsersGroups = (peerCoinInstance) => {
   return dispatch => {
-    console.log('dispatched')
     peerCoinInstance.listGroups().then(function(result) {
-      console.log(result)
-      console.log('this is the result')
       let groupData = {
         groupIDs: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
         groupNames: result[1].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
         groupBalance: String(result[2]).split(',')
       }
-      console.log("the result...")
-      console.log(groupData)
       dispatch(saveUsersGroups(groupData))
-      console.log("done")
     })
   }
 }
@@ -49,18 +43,13 @@ export const savePeerCoinInstance = (peerCoinInstance) => ({
   peerCoinInstance
 })
 
-export const saveUsersGroups = (groupData) => {
-  console.log('the group haz some data:', groupData)
+export const saveUsersGroups = (groupData) => ({
+  type: actions.SAVE_USER_GROUPS,
+  groupData: groupData
+})
 
-  return ({
-    type: actions.SAVE_USER_GROUPS,
-    groupData: groupData
-  })
-}
 
-export const setScreen = windowNum => {
-  console.log("set Screeennn!!!", windowNum)
-  return ({
+export const setScreen = windowNum => ({
   type: actions.SET_SCREEN,
   windowNum
-})}
+})

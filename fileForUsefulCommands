@@ -75,3 +75,6 @@ return (groupIds, groupNames);
 "aname", "a"
 "0xca35b7d915458ef540ade6068dfe2f44e8fa733c", "a", 44
 "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c", "a", 55
+
+
+0x0002b6b256b11db1722a73feaf2019b0f758fd73 (contract deployed here on kovan)

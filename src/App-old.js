@@ -1,11 +1,9 @@
 import React, { Component } from 'react'
 import PeerCoinContract from '../build/contracts/PeerCoin.json'
 import Config from '../truffle.js'
-import { connect } from 'react-redux'
 import Web3 from 'web3'
 import './App.css'
-import SideBar from './containers/SideBar.js'
-import HowItWorks from './components/HowItWorks.js'
+
 import {createSampleGroups} from './test/testTruffle.js'
 
 class App extends Component {
@@ -196,39 +194,51 @@ class App extends Component {
   }
 
   render() {
-    const displayMainWindow = () => {
-      if (this.props.screen == 0)
-          return <HowItWorks/>
-      // else if(this.props.screen == 1)
-      //     return <PayScreen/>
-      // else if(this.props.screen == 2)
-      //     return <MainWindow  />
-      // else if(this.props.screen == 3)
-      //     return <Transections />
-    }
+    const groups = this.state.groupIDs.map((gID, i) =>
+      <tr key={i}>
+        <td>{gID}</td>
+        <td>{this.state.groupNames[i]}</td>
+        <td>{this.state.groupBalance[i]}</td>
+      </tr>
+    )
     return (
-      <div>
-        <SideBar/>
-        {displayMainWindow()}
+      <div className="App">
+        <h1>BeerBot</h1>
+        <p>Never forget who owes you a beer!</p>
+        {/*<nav className="navbar pure-menu pure-menu-horizontal">
+            <ul className="pure-menu-list">
+                <li className="pure-menu-item"><a href="#" className="pure-menu-link">News</a></li>
+                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Sports</a></li>
+                <li className="pure-menu-item"><a href="#" className="pure-menu-link">Finance</a></li>
+            </ul>
+        </nav>*/}
+        <div>
+          <p>Create Group:</p>
+          <input placeholder={'Group Name'} value={this.state.groupNameInput} onChange={this.setInputGroup}/>
+          <input placeholder={'Group ID'} value={this.state.groupIdInput} onChange={this.setInputId}/>
+          <button onClick={this.createGroup}>Create Group</button>
+          <p>Send Funds:</p>
+          <input placeholder={'To address'} value={this.state.toAccountInput} onChange={this.setInputToAccount}/>
+          <input placeholder={0} type="number" value={this.state.amountInput} onChange={this.setInputAmount}/>
+          <button onClick={this.sendMoney}>Send Money</button>
+          <button onClick={this.listYourGroups}>List Groups</button>
+          <button onClick={this.viewBalance}>Get Ballance</button>
+          <table>
+            <thead>
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Ballance</th>
+              </tr>
+            </thead>
+            <tbody>
+              {groups}
+            </tbody>
+          </table>
+        </div>
       </div>
     )
   }
 }
 
-const mapStateToProps = state => {
-  const { screen } = state
-  // const {
-  //   isFetching,
-  //   lastUpdated,
-  //   items: posts
-  // } = postsByReddit[selectedReddit] || {
-  //   isFetching: true,
-  //   items: []
-  // }
-
-  return {
-    screen
-  }
-}
-
-export default connect(mapStateToProps)(App)
+export default App

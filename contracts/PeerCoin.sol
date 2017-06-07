@@ -11,7 +11,7 @@ contract PeerCoin {
 
   struct Group {
     mapping (address => int) ballances;
-    // mppping (address => bool) isMember; //test if person is a member of the group
+    mapping (address => bool) isMember; //test if person is a member of the group
     address[] members; //an array to easily iterate through the members
     /*mapping (bytes32 => GroupBets) ballances;*/
     /*bytes32[] members; //an array to easily iterate through the bets*/
@@ -33,14 +33,16 @@ contract PeerCoin {
   struct User {
     bytes32[] groups;
     bytes32[] groupBets;
+    bytes32[] groupInvites;
+    mapping (bytes32 => bool) pendingInvite;
     bool exists;
   }
 
   mapping (bytes32 => Group) public groups;
   mapping (address => User) public users;
 
-  function createGroup (bytes32 gname, bytes32 gid) {
-    /*if(!groups[id].exists) {*/
+  function createGroup (bytes32 gname, bytes32 gid) returns (bool) {
+    if(!groups[gid].exists) {
       //create group
       Group memory newGroup;
 
@@ -49,22 +51,39 @@ contract PeerCoin {
 
       groups[gid] = newGroup;
       groups[gid].members.push(msg.sender);
+      groups[gid].isMember[msg.sender] = true;
 
       // Add group to the users list of groups
       addToUsersGroup(gid);
 
-      /*return true;
+      return true;
     } else {
       return false;
-    }*/
+    }
   }
 
-  function addToUsersGroup (bytes32 id) internal {
+//   function inviteUser(bytes32 gid, address newMember) {
+//       if (!groups[gid].isMember[newMember]) { // TODO:: do exists check also
+//           users[newMember].groupInvites.push(gid);
+//           users[newMember].pendingInvite[gid] = true;
+//       }
+//   }
+
+//   function acceptInvite(bytes32 gid, address newMember) {
+//       if (!groups[gid].isMember[newMember] && users[newMember].pendingInvite[gid]) { // TODO:: do exists check also
+//           users[newMember].groupInvites.push(gid);
+//       }
+//   }
+
+  function addToUsersGroup (bytes32 gid) /*internal*/ {
     //TODO: Add more checks and security here:
     // iterate through to check if pressent? Or check in the group itself if this user is referenced in members.
     users[msg.sender].exists = true;
-    users[msg.sender].groups.push(id);
+    users[msg.sender].groups.push(gid);
+    groups[gid].isMember[msg.sender] = true;
   }
+
+//   function invite (b)
 
   // TODO: Add balance int[] as a return types
   function listGroups() constant returns (bytes32[],bytes32[],int[]) {
@@ -85,7 +104,7 @@ contract PeerCoin {
       groupIds[i] = curGroupId;
       groupNames[i] = curGroup.name;
       ballances[i] = groups[curGroupId].ballances[msg.sender];
-      GroupGet(msg.sender, curGroup.name, curGroupId, ballances[i]);
+      GroupGet(msg.sender, curGroup.name, curGroupId, groups[curGroupId].ballances[msg.sender]);
     }
     return (groupIds, groupNames,ballances);
   }

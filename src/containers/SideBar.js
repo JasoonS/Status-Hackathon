@@ -16,7 +16,7 @@ class SideBar extends Component {
     // TODO:: set up font awesome (fa) icons. Make these menu items visible.
     // Look at https://github.com/negomi/react-burger-menu for instructions
     return (
-      <Menu pageWrapId={ "page-wrap" } outerContainerId={ "outer-container" } right noOverlay>
+      <Menu right>
         <a id="about" onClick={() => this.props.setScreen(0)} className="menu-item" ><i className="fa fa-fw fa-star-o" /><span>Home</span></a>
         <a id="home" onClick={() => this.props.setScreen(1)} className="menu-item" ><i className="fa fa-fw fa-star-o" /><span>How It Works</span></a>
         <a id="contact" onClick={() => this.props.setScreen(2)} className="menu-item" ><i className="fa fa-fw fa-star-o" /><span>My Groups</span></a>

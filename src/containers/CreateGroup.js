@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
-import {loadUsersGroups} from '../actions'
+import {createGroup} from '../actions'
 
 class CreateGroup extends Component {
   constructor(props) {
@@ -38,7 +38,6 @@ class CreateGroup extends Component {
     })
     if (changeId) {
       this.props.peerCoinInstance.isGroupIdUsed(newGroupId).then(result => {
-        console.log('is the id available?', result)
         this.setState({
           ...this.state,
           isIdAvailable: !result,
@@ -86,7 +85,12 @@ class CreateGroup extends Component {
       idRequiredWarn,
       tokenRequiredWarn
     } = this.state
-    let createGroup = () => {
+    const {
+      userAddress,
+      peerCoinInstance
+    } = this.props
+    let createGroupButton = () => {
+      console.log('create group internal funcion call')
       let nameRequiredWarn = false
       let idRequiredWarn = false
       let tokenRequiredWarn = false
@@ -105,17 +109,18 @@ class CreateGroup extends Component {
         tokenRequiredWarn,
         nameRequiredWarn
       })
-      if (!(nameRequiredWarn || nameRequiredWarn || nameRequiredWarn)){
-        this.props.peerCoinInstance.isGroupIdUsed(groupIdInput).then(result => {
-          console.log('is the id available?', result)
-          this.setState({
-            ...this.state,
-            isIdAvailable: !result
-          })
+      if (!(nameRequiredWarn || idRequiredWarn || tokenRequiredWarn)){
+        console.log('met conditions: creating group')
+        this.props.peerCoinInstance.isGroupIdUsed(groupIdInput).then(gidUnavailable => {
+          if (!gidUnavailable) {
+            console.log('met conditions: creating group')
+            this.props.dispatch(
+              createGroup(peerCoinInstance, groupNameInput, groupIdInput, tokenName, userAddress)
+            )
+          }
         })
-        // this.props.dispatch(
-        //   loadUsersGroups(this.props.peerCoinInstance, this.setGroupName, this.setGroupID, this.setTokenName)
-        //   // TODO: show loader here!
+      } else {
+        console.log('couldnt create group')
       }
     }
     return (
@@ -151,7 +156,7 @@ class CreateGroup extends Component {
           onChange={groupIdInput}
         />*/}
 
-        <RaisedButton onClick={createGroup} label='Create Group' primary={true} fullWidth={true}/>
+        <RaisedButton onClick={createGroupButton} label='Create Group' primary={true} fullWidth={true}/>
       </div>
     )
   }
@@ -163,7 +168,8 @@ const mapStateToProps = state => {
     peerCoinLoaded: state.peerCoinLoaded,
     peerCoinInstance: state.peerCoinInstance,
     groupDataLoaded: state.groupDataLoaded,
-    groupData: state.groupData
+    groupData: state.groupData,
+    userAddress: state.userAddress
    }
 }
 

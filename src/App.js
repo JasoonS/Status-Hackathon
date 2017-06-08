@@ -9,7 +9,7 @@ import Home from './containers/Home.js'
 import MyGroups from './containers/MyGroups.js'
 import MyBets from './containers/MyBets.js'
 import Tokens from './containers/Tokens.js'
-import {loadPeerCoinInstance} from './actions'
+import {loadPeerCoinInstanceAndUserAddress} from './actions'
 import PropTypes from 'prop-types'
 
 class App extends Component {
@@ -24,7 +24,7 @@ class App extends Component {
 
   componentWillMount() {
     this.props.dispatch(
-      loadPeerCoinInstance()
+      loadPeerCoinInstanceAndUserAddress()
     )
   }
 

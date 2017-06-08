@@ -16,6 +16,12 @@ const reducer = (state = initialState, action) => {
         ...state,
         screen: action.windowNum
       }
+    case actions.SAVE_USER_ADDRESS:
+      console.log('userAddress', action.userAddress)
+      return {
+        ...state,
+        userAddress: action.userAddress
+      }
     case actions.SAVE_PEER_COIN:
       console.log('SAVE_PEER_COIN')
       return {

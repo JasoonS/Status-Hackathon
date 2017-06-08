@@ -87,7 +87,8 @@ class CreateGroup extends Component {
     } = this.state
     const {
       userAddress,
-      peerCoinInstance
+      peerCoinInstance,
+      busyCreatingGroup
     } = this.props
     let createGroupButton = () => {
       console.log('create group internal funcion call')
@@ -123,10 +124,9 @@ class CreateGroup extends Component {
         console.log('couldnt create group')
       }
     }
-    return (
-      <div className='CreateGroup'>
+    const createGroupGUI = () => (
+      <div>
         <h1>CreateGroup</h1>
-
         <TextField
           floatingLabelText='Group Name'
           onChange={this.setGroupName}
@@ -159,6 +159,14 @@ class CreateGroup extends Component {
         <RaisedButton onClick={createGroupButton} label='Create Group' primary={true} fullWidth={true}/>
       </div>
     )
+    return (
+      <div className='CreateGroup'>
+        {busyCreatingGroup? (<div>
+          <h1>Creating Group</h1>
+          <h2>Please be patient</h2>
+        </div>) : createGroupGUI()}
+      </div>
+    )
   }
 }
 
@@ -169,7 +177,8 @@ const mapStateToProps = state => {
     peerCoinInstance: state.peerCoinInstance,
     groupDataLoaded: state.groupDataLoaded,
     groupData: state.groupData,
-    userAddress: state.userAddress
+    userAddress: state.userAddress,
+    busyCreatingGroup: state.busyCreatingGroup
    }
 }
 

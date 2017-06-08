@@ -37,6 +37,24 @@ const reducer = (state = initialState, action) => {
         groupData: action.groupData,
         groupDataLoaded: true
       }
+    case actions.START_GROUP_CREATE:
+      return {
+        ...state,
+        busyCreatingGroup: true
+      }
+    case actions.CREATED_GROUP:
+      return {
+        ...state,
+        busyCreatingGroup: false
+      }
+    case actions.LOAD_GROUP_INVITE:
+      console.log('screen', actions)
+      return {
+        ...state,
+        screen: 7,
+        curGroupId: action.groupID,
+        screenContext: action.screenContext
+      }
     default:
       return state
   }

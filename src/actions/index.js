@@ -9,6 +9,7 @@ export const actions = {
   SAVE_USER_GROUPS: 'SAVE_USER_GROUPS',
   START_GROUP_CREATE: 'START_GROUP_CREATE',
   SAVE_USER_ADDRESS: 'SAVE_USER_ADDRESS',
+  LOAD_GROUP_INVITE: 'LOAD_GROUP_INVITE',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -59,19 +60,11 @@ export const loadGroupDetails = (peerCoinInstance, gid) => {
 }
 
 export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName, userAddress) => {
-  console.log('create group...', groupNameInput, groupId, tokenName)
   return dispatch => {
-    console.log('create group...', groupNameInput, groupId, tokenName)
     dispatch(startingCreateNewGroup())
-    console.log('create group...', groupNameInput, groupId, tokenName)
     peerCoinInstance.createGroup(groupNameInput, groupId/*, tokenName*/, {from: userAddress}).then(function(result) {
-      // let groupData = {
-      //   groupIDs: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
-      //   groupNames: result[1].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
-      //   groupBalance: String(result[2]).split(',')
-      // }
-      console.log('save new group', result)
-      dispatch(saveNewGroup())
+      dispatch(finishCreateGroup())
+      dispatch(loadGroupInvites(groupId, 'createdGroup'))
     })
   }
 }
@@ -98,10 +91,17 @@ export const setScreen = windowNum => ({
 
 export const startingCreateNewGroup = () => ({
   type: actions.START_GROUP_CREATE,
-  // windowNum
 })
 
-export const saveNewGroup = () => ({
-  type: actions.CREATED_GROUP,
-  // windowNum
+export const finishCreateGroup = () => ({
+  type: actions.CREATED_GROUP
 })
+
+export const loadGroupInvites = (groupID, screenContext) =>{
+  console.log('test', screenContext)
+  return ({
+    type: actions.LOAD_GROUP_INVITE,
+    groupID,
+    screenContext
+  })
+}

@@ -8,6 +8,7 @@ import CreateGroup from './containers/CreateGroup.js'
 import Home from './containers/Home.js'
 import MyGroups from './containers/MyGroups.js'
 import MyBets from './containers/MyBets.js'
+import InviteFriends from './containers/InviteFriends.js'
 import Tokens from './containers/Tokens.js'
 import {loadPeerCoinInstanceAndUserAddress} from './actions'
 import PropTypes from 'prop-types'
@@ -46,6 +47,8 @@ class App extends Component {
             return <Tokens /> //TODO:: rename this to TokenInfo
         else if(this.props.screen == 6)
             return <BotInstructions />
+        else if(this.props.screen == 7)
+            return <InviteFriends />
       } else {
         return (
           <p>Wating to sync to the contract on the network.</p>

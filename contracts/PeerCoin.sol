@@ -6,15 +6,15 @@ contract PeerCoin {
     address indexed _from,
     bytes32 indexed _name,
     bytes32 indexed _id,
-    int _ballance
+    int _balance
   );
 
   struct Group {
-    mapping (address => int) ballances;
+    mapping (address => int) balances;
     mapping (address => bool) isMember; //test if person is a member of the group
     address[] members; //an array to easily iterate through the members
-    /*mapping (bytes32 => GroupBets) ballances;*/
-    /*bytes32[] members; //an array to easily iterate through the bets*/
+    /*mapping (bytes32 => GroupBets) bets;*/
+    bytes32[] bets;
     bytes32 name;
     bool exists;
   }
@@ -28,6 +28,7 @@ contract PeerCoin {
   struct Bet {
     bool stance;
     uint amount;
+    bool isOpen;
     bool exists;
   }
   struct User {
@@ -40,6 +41,13 @@ contract PeerCoin {
 
   mapping (bytes32 => Group) public groups;
   mapping (address => User) public users;
+
+  modifier onlyGroupMember(bytes32 gid) {
+    if (!groups[gid].isMember[msg.sender]) {
+      throw;
+    }
+    _;
+  }
 
   function createGroup (bytes32 gname, bytes32 gid) returns (bool) {
     if(!groups[gid].exists) {
@@ -62,20 +70,7 @@ contract PeerCoin {
     }
   }
 
-//   function inviteUser(bytes32 gid, address newMember) {
-//       if (!groups[gid].isMember[newMember]) { // TODO:: do exists check also
-//           users[newMember].groupInvites.push(gid);
-//           users[newMember].pendingInvite[gid] = true;
-//       }
-//   }
-
-//   function acceptInvite(bytes32 gid, address newMember) {
-//       if (!groups[gid].isMember[newMember] && users[newMember].pendingInvite[gid]) { // TODO:: do exists check also
-//           users[newMember].groupInvites.push(gid);
-//       }
-//   }
-
-  function addToUsersGroup (bytes32 gid) /*internal*/ {
+  function addToUsersGroup (bytes32 gid) internal {
     //TODO: Add more checks and security here:
     // iterate through to check if pressent? Or check in the group itself if this user is referenced in members.
     users[msg.sender].exists = true;
@@ -83,7 +78,30 @@ contract PeerCoin {
     groups[gid].isMember[msg.sender] = true;
   }
 
-//   function invite (b)
+  function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
+    uint length = groups[gid].members.length;
+    int[] memory balances = new int[](length);
+    for (uint i = 0; i < length; i++) {
+      address curMember = groups[gid].members[i];
+
+      balances[i] = groups[gid].balances[curMember];
+    }
+    return (groups[gid].bets, groups[gid].members, balances);
+  }
+
+  function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
+    users[newMember].groupInvites.push(gid);
+    users[newMember].pendingInvite[gid] = true;
+    users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
+    // Rather store in a server, and check with the previous line if they have an account.
+    // this append only, so not scalable if user joins many many groups.
+  }
+
+  function acceptInvite(bytes32 gid) {
+    if (!groups[gid].isMember[msg.sender] && users[msg.sender].pendingInvite[gid]) { // TODO:: do exists check also
+      users[msg.sender].pendingInvite[gid] = true;
+    }
+  }
 
   // TODO: Add balance int[] as a return types
   function listGroups() constant returns (bytes32[],bytes32[],int[]) {
@@ -93,7 +111,7 @@ contract PeerCoin {
 
     bytes32[] memory groupIds = new bytes32[](length);
     bytes32[] memory groupNames = new bytes32[](length);
-    int[] memory ballances = new int[](length);
+    int[] memory balances = new int[](length);
 
     // This for loop isn't too expensive because this function is 'constart'
     for (uint i = 0; i < length; i++) {
@@ -103,35 +121,24 @@ contract PeerCoin {
 
       groupIds[i] = curGroupId;
       groupNames[i] = curGroup.name;
-      ballances[i] = groups[curGroupId].ballances[msg.sender];
-      GroupGet(msg.sender, curGroup.name, curGroupId, groups[curGroupId].ballances[msg.sender]);
+      balances[i] = groups[curGroupId].balances[msg.sender];
+      GroupGet(msg.sender, curGroup.name, curGroupId, groups[curGroupId].balances[msg.sender]);
     }
-    return (groupIds, groupNames,ballances);
+    return (groupIds, groupNames,balances);
   }
 
-  function sendToken(address toAdr, bytes32 gid, uint amount) returns (int ballance){
-    groups[gid].ballances[msg.sender] = groups[gid].ballances[msg.sender] - int(amount);
-    groups[gid].ballances[toAdr] = groups[gid].ballances[toAdr] + int(amount);
-    return groups[gid].ballances[msg.sender];
+  function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
+    groups[gid].balances[msg.sender] = groups[gid].balances[msg.sender] - int(amount);
+    groups[gid].balances[toAdr] = groups[gid].balances[toAdr] + int(amount);
+    return groups[gid].balances[msg.sender];
   }
 
-  function getBallance(bytes32 gid) constant returns (int balance) {
-      return groups[gid].ballances[msg.sender];
+  function getbalance(bytes32 gid) constant returns (int balance) {
+      return groups[gid].balances[msg.sender];
   }
 
   //for debugging:
   function getSenderAddress() constant returns (address) {
       return msg.sender;
   }
-
-//   function getGroupName(bytes32 id) constant returns (bytes32 name) {
-//     if(!groups[id].exists)
-//       throw;
-//     return groups[id].name;
-//   }
 }
-
-/*sudo apt-get install software-properties-common
-sudo add-apt-repository -y ppa:ethereum/ethereum
-sudo apt-get update
-sudo apt-get install ethereum*/

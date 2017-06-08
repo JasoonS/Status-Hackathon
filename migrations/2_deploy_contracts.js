@@ -18,9 +18,9 @@ module.exports = function(deployer) {
     return PeerCoin.deployed()
   }).then((instance) => {
     peerCoin = instance
-    instance.createGroup("a", "aname")
-    instance.createGroup("b", "bname")
-    return instance.createGroup("c", "cname")
+    instance.createGroup("aname", "a")
+    instance.createGroup("bname", "b")
+    return instance.createGroup("cname", "c")
     // instance.sendToken("0xf15e7f2ba0476a8a1e76138245f6fd4ffaf04bb4", "a", 5)
     // instance.sendToken("0xf15e7F2bA0476A8a1e76138245f6Fd4FfaF04bB4", "b", 123)
     // instance.sendToken("0xf15e7F2bA0476A8a1e76138245f6Fd4FfaF04bB4", "c", 55)

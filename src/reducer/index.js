@@ -5,7 +5,7 @@ import {
 const initialState = {
   peerCoinLoaded: false,
   groupDataLoaded: false,
-  screen: 2
+  screen: 4
 }
 
 const reducer = (state = initialState, action) => {

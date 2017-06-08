@@ -3,7 +3,9 @@ Please don't delete this file. It is for storing any commands that are used ofte
 status-dev-cli scan
 status-dev-cli switch-node http://localhost:8546 --ip 10.0.0.12
 status-dev-cli switch-node http://localhost:8546 --ip 192.168.56.101
-status-dev-cli add '{"whisper-identity":"testing", "name":"test", "dapp-url":"http://10.5.50.12:8000"}' --ip 192.168.56.101
+status-dev-cli switch-node http://localhost:8546 --ip 172.18.150.165
+status-dev-cli add '{"whisper-identity":"testing", "name":"test", "dapp-url":"http://10.5.50.12:8000"}' --ip 172.18.150.165
+//192.168.56.101
 
 
 truffle compile && truffle migrate -reset

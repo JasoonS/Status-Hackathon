@@ -70,6 +70,10 @@ contract PeerCoin {
     }
   }
 
+  function isGroupIdUsed (bytes32 gid) constant returns( bool ) {
+    return groups[gid].exists;
+  }
+
   function addToUsersGroup (bytes32 gid) internal {
     //TODO: Add more checks and security here:
     // iterate through to check if pressent? Or check in the group itself if this user is referenced in members.

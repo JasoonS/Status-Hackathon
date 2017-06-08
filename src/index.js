@@ -7,7 +7,6 @@ import injectTapEventPlugin from 'react-tap-event-plugin';
 injectTapEventPlugin(); // something material ui needs...
 import thunk from 'redux-thunk';
 
-import web3Redux from './src/reducer';
 import reducer from './reducer'
 
 import App from './App';
@@ -18,11 +17,11 @@ const store = createStore(
   composeEnhancers(applyMiddleware(thunk))
 );
 
-// <MuiThemeProvider>
-// </MuiThemeProvider>
 render(
   <Provider store={store}>
+    <MuiThemeProvider>
       <App />
+    </MuiThemeProvider>
   </Provider>,
   document.getElementById('root')
 );

@@ -16,3 +16,6 @@ build_webpack
 npm-debug.log
 .truffle-solidity-loader
 .idea
+
+# test comments
+fileForUsefulCommands

@@ -9,8 +9,9 @@ import Home from './containers/Home.js'
 import MyGroups from './containers/MyGroups.js'
 import MyBets from './containers/MyBets.js'
 import InviteFriends from './containers/InviteFriends.js'
+import SelectAccount from './containers/SelectAccount.js'
 import Tokens from './containers/Tokens.js'
-import {loadPeerCoinInstanceAndUserAddress} from './actions'
+import {loadPeerCoinInstanceAndUserAddress, setScreen, setAccountNum} from './actions'
 import PropTypes from 'prop-types'
 
 class App extends Component {
@@ -24,6 +25,25 @@ class App extends Component {
   }
 
   componentWillMount() {
+    let params = window.location.hash.substr(1).split('&');
+
+    if (params.length > 1) {
+      console.log('getting params')
+      console.log(params)
+      console.log(window.location.hash.substr(1))
+      console.log('done')
+      this.props.dispatch(
+        setAccountNum(parseInt(params[1]))
+      )
+      this.props.dispatch(
+        setScreen(parseInt(params[2]))
+      )
+    } else {
+      setScreen(0)
+      console.log('shouldnt show')
+    }
+
+    console.log(params)
     this.props.dispatch(
       loadPeerCoinInstanceAndUserAddress()
     )
@@ -32,23 +52,27 @@ class App extends Component {
   render() {
     const displayMainWindow = () => {
       if (this.props.peerCoinLoaded) {
-        console.log("you are on screen:", this.props.screen)
-        if (this.props.screen == 0)
-          return <Home />
-        else if(this.props.screen == 1)
-            return <HowItWorks />
-        else if(this.props.screen == 2)
-            return <MyGroups />
-        else if (this.props.screen == 3)
-          return <MyBets />
-        else if(this.props.screen == 4)
-          return <CreateGroup />
-        else if(this.props.screen == 5)
-            return <Tokens /> //TODO:: rename this to TokenInfo
-        else if(this.props.screen == 6)
-            return <BotInstructions />
-        else if(this.props.screen == 7)
-            return <InviteFriends />
+        if (this.props.accountIsSelected){
+          console.log("you are on screen:", this.props.screen)
+          if (this.props.screen == 0)
+            return <Home />
+          else if(this.props.screen == 1)
+              return <HowItWorks />
+          else if(this.props.screen == 2)
+              return <MyGroups />
+          else if (this.props.screen == 3)
+            return <MyBets />
+          else if(this.props.screen == 4)
+            return <CreateGroup />
+          else if(this.props.screen == 5)
+              return <Tokens /> //TODO:: rename this to TokenInfo
+          else if(this.props.screen == 6)
+              return <BotInstructions />
+          else if(this.props.screen == 7)
+              return <InviteFriends />
+        } else {
+          return <SelectAccount />
+        }
       } else {
         return (
           <p>Wating to sync to the contract on the network.</p>
@@ -77,7 +101,8 @@ class App extends Component {
 const mapStateToProps = state => {
   return {
     screen: state.screen,
-    peerCoinLoaded: state.peerCoinLoaded
+    peerCoinLoaded: state.peerCoinLoaded,
+    accountIsSelected: state.accountIsSelected
    }
 }
 

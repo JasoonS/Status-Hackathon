@@ -80,3 +80,16 @@ return (groupIds, groupNames);
 
 
 0x0002b6b256b11db1722a73feaf2019b0f758fd73 (contract deployed here on kovan)
+
+
+
+adb reverse tcp:8546 tcp:8546 && adb reverse tcp:3000 tcp:3000 && status-dev-cli switch-node http://10.0.2.67:8546 --ip 10.0.2.66
+adb reverse tcp:8546 tcp:8546 && adb reverse tcp:3000 tcp:3000 && status-dev-cli switch-node http://localhost:8546 --ip 10.0.2.66
+status-dev-cli switch-node http://localhost:8546 --ip 10.0.2.66
+
+truffle compile && truffle migrate --reset
+status-dev-cli list --ip 10.0.2.66
+
+status-dev-cli watch $PWD "dapp-0x74727566666c652d626f782d737461747573" --ip 10.0.2.66
+
+status-dev-cli log "dapp-0x74727566666c652d626f782d737461747573" --ip 10.0.2.66

@@ -10,6 +10,7 @@ export const actions = {
   START_GROUP_CREATE: 'START_GROUP_CREATE',
   SAVE_USER_ADDRESS: 'SAVE_USER_ADDRESS',
   LOAD_GROUP_INVITE: 'LOAD_GROUP_INVITE',
+  SET_ACCOUNT_NUM: 'SET_ACCOUNT_NUM',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -25,7 +26,7 @@ export const loadPeerCoinInstanceAndUserAddress = () => {
     console.log('dispatched')
     web3RPC.eth.getAccounts(function(error, accounts) {
       console.log('addresses', accounts)
-      dispatch(saveUserAddress(accounts[0]))
+      dispatch(saveUserAddresses(accounts))
       peerCoin.deployed().then((peerCoinInstance) => {
         dispatch(savePeerCoinInstance(peerCoinInstance))
       })
@@ -33,7 +34,7 @@ export const loadPeerCoinInstanceAndUserAddress = () => {
   }
 }
 
-export const loadUsersGroups = (peerCoinInstance) => {
+export const loadUsersGroups = (peerCoinInstance, userAddress) => {
   return dispatch => {
     peerCoinInstance.listGroups().then(function(result) {
       let groupData = {
@@ -59,24 +60,30 @@ export const loadGroupDetails = (peerCoinInstance, gid) => {
   }
 }
 
-export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName, userAddress) => {
+export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName, userAddress, accountIndex) => {
+  console.log('heeere baby')
   return dispatch => {
     dispatch(startingCreateNewGroup())
-    peerCoinInstance.createGroup(groupNameInput, groupId/*, tokenName*/, {from: userAddress}).then(function(result) {
+    peerCoinInstance.createGroup(groupNameInput, groupId/*, tokenName*/, {from: userAddress[0], gas:3000000}).then(function(result) {
       dispatch(finishCreateGroup())
       dispatch(loadGroupInvites(groupId, 'createdGroup'))
     })
   }
 }
 
+export const setAccountNum = (accountNum) => ({
+  type: actions.SET_ACCOUNT_NUM,
+  accountNum
+})
+
 export const savePeerCoinInstance = (peerCoinInstance) => ({
   type: actions.SAVE_PEER_COIN,
   peerCoinInstance
 })
 
-export const saveUserAddress = (userAddress) => ({
+export const saveUserAddresses = (userAddresses) => ({
   type: actions.SAVE_USER_ADDRESS,
-  userAddress
+  userAddresses
 })
 
 export const saveUsersGroups = (groupData) => ({

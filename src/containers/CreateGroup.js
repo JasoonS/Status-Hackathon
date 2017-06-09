@@ -86,9 +86,10 @@ class CreateGroup extends Component {
       tokenRequiredWarn
     } = this.state
     const {
-      userAddress,
+      userAddresses,
       peerCoinInstance,
-      busyCreatingGroup
+      busyCreatingGroup,
+      accountNum
     } = this.props
     let createGroupButton = () => {
       console.log('create group internal funcion call')
@@ -115,8 +116,9 @@ class CreateGroup extends Component {
         this.props.peerCoinInstance.isGroupIdUsed(groupIdInput).then(gidUnavailable => {
           if (!gidUnavailable) {
             console.log('met conditions: creating group')
+            console.log(groupNameInput, groupIdInput, tokenName, userAddresses, accountNum)
             this.props.dispatch(
-              createGroup(peerCoinInstance, groupNameInput, groupIdInput, tokenName, userAddress)
+              createGroup(peerCoinInstance, groupNameInput, groupIdInput, tokenName, userAddresses, accountNum)
             )
           }
         })
@@ -126,7 +128,7 @@ class CreateGroup extends Component {
     }
     const createGroupGUI = () => (
       <div>
-        <h1>CreateGroup</h1>
+        <h1>CreateGroup New</h1>
         <TextField
           floatingLabelText='Group Name'
           onChange={this.setGroupName}
@@ -177,8 +179,9 @@ const mapStateToProps = state => {
     peerCoinInstance: state.peerCoinInstance,
     groupDataLoaded: state.groupDataLoaded,
     groupData: state.groupData,
-    userAddress: state.userAddress,
-    busyCreatingGroup: state.busyCreatingGroup
+    userAddresses: state.userAddresses,
+    busyCreatingGroup: state.busyCreatingGroup,
+    accountNum: state.accountNum
    }
 }
 

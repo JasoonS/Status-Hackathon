@@ -22,7 +22,7 @@ class MyGroups extends Component {
   componentWillMount() {
     console.log('saving load user groups')
     this.props.dispatch(
-      loadUsersGroups(this.props.peerCoinInstance)
+      loadUsersGroups(this.props.peerCoinInstance, this.props.addresses[this.props.accountNum])
     )
   }
 
@@ -73,6 +73,8 @@ const mapStateToProps = state => {
     peerCoinLoaded: state.peerCoinLoaded,
     peerCoinInstance: state.peerCoinInstance,
     groupDataLoaded: state.groupDataLoaded,
+    addresses: state.addresses,
+    accountNum: state.accountNum,
     groupData: state.groupData
    }
 }

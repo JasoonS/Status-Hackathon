@@ -108,10 +108,10 @@ contract PeerCoin {
   }
 
   // TODO: Add balance int[] as a return types
-  function listGroups() constant returns (bytes32[],bytes32[],int[]) {
+  function listGroups(address uaddr) constant returns (bytes32[],bytes32[],int[]) {
 //   function listGroups() constant returns (uint length) {
     /*uint length = people.length;*/
-    uint length = users[msg.sender].groups.length;
+    uint length = users[uaddr].groups.length;
 
     bytes32[] memory groupIds = new bytes32[](length);
     bytes32[] memory groupNames = new bytes32[](length);
@@ -119,14 +119,14 @@ contract PeerCoin {
 
     // This for loop isn't too expensive because this function is 'constart'
     for (uint i = 0; i < length; i++) {
-      bytes32 curGroupId = users[msg.sender].groups[i];
+      bytes32 curGroupId = users[uaddr].groups[i];
       Group memory curGroup;
       curGroup = groups[curGroupId];
 
       groupIds[i] = curGroupId;
       groupNames[i] = curGroup.name;
-      balances[i] = groups[curGroupId].balances[msg.sender];
-      GroupGet(msg.sender, curGroup.name, curGroupId, groups[curGroupId].balances[msg.sender]);
+      balances[i] = groups[curGroupId].balances[uaddr];
+      /*GroupGet(uaddr, curGroup.name, curGroupId, groups[curGroupId].balances[uaddr]);*/
     }
     return (groupIds, groupNames,balances);
   }

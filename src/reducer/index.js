@@ -55,7 +55,7 @@ const reducer = (state = initialState, action) => {
         busyCreatingGroup: false
       }
     case actions.LOAD_GROUP_INVITE:
-      console.log('screen', actions)
+      console.log('screen', action)
       return {
         ...state,
         screen: 7,

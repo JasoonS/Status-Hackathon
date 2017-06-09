@@ -15,7 +15,9 @@ export const actions = {
 };
 
 export const loadPeerCoinInstanceAndUserAddress = () => {
-  const provider = window.web3.currentProvider
+  var {host, port} = Config.networks[process.env.NODE_ENV]
+  const provider = new Web3.providers.HttpProvider('http://' + host + ':' + port)
+  // const provider = window.web3.currentProvider
   const contract = require('truffle-contract')
   const peerCoin = contract(PeerCoinContract)
   peerCoin.setProvider(provider)
@@ -34,7 +36,7 @@ export const loadPeerCoinInstanceAndUserAddress = () => {
   }
 }
 
-export const loadUsersGroups = (peerCoinInstance, userAddress) => {
+export const loadUsersGroups = (peerCoinInstance,) => {
   return dispatch => {
     peerCoinInstance.listGroups().then(function(result) {
       let groupData = {

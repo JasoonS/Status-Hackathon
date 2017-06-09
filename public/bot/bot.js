@@ -1,3 +1,5 @@
+
+
 status.addListener("init", function () {
   return {"text-message": "Welcome to Genesis Token Tracker. ʕ•͡ᴥ•ʔ"};
 });
@@ -6,9 +8,7 @@ var usersIndex = 0
 
 function browse(screenNum, params){
   var host = 'http://localhost:3000/'
-  // var host = 'http://genesis-token-tracker.s3-website-us-west-2.amazonaws.com/'
   var url = host + '#junk&' + usersIndex + '&' + screenNum
-  // var url = host + '#junk&' + usersIndex + '&'
   console.log('this is the brows log...')
   return {
           title: "Browser",
@@ -18,11 +18,21 @@ function browse(screenNum, params){
           markup: status.components.bridgedWebView(url)
   };
 }
+status.command({
+    name: "help",
+    title: 'the page where it tells you what this is about',
+    description: 'the page',
+    fullscreen: true,
+    onSend: function(params){
+      return browse(1, params)
+    }
+});
 
+//TODO return to the chat bot. STRETCH
 status.command({
       name: "myGroups",
-      title: 'SGT token holder distribution',
-      description: 'Browse SGT token holder distribution histogram',
+      title: 'list all groups that you are part of',
+      description: 'List all groups that you are part of',
       fullscreen: true,
       onSend: function(params){
         return browse(2, params)
@@ -30,9 +40,20 @@ status.command({
 });
 
 status.command({
+    name: "myBets",
+    title: 'list all your bets',
+    description: 'list of all bets',
+    fullscreen: true,
+    onSend: function(params){
+      return browse(3, params)
+    }
+});
+
+//TODO: create group through chat bot using sequential parameters
+status.command({
     name: "createGroup",
-    title: 'SGT token holder distribution',
-    description: 'Browse SGT token holder distribution histogram',
+    title: 'create a betting group',
+    description: 'create new group',
     fullscreen: true,
     onSend: function(params){
       return browse(4, params)
@@ -40,19 +61,76 @@ status.command({
 });
 
 status.command({
-    name: "your_tokens",
-    title: 'Your token',
-    description: 'Check if you have received new tokens',
+    name: "tokenInfo",
+    title: 'List the tokens',
+    description: 'List the tokens',
     fullscreen: true,
-    params: [
-      {
-          name: "account",
-          type: status.types.TEXT,
-          placeholder: "SGT holding account address"
-      }
-    ],
     onSend: function(params){
-      return browse('token_line', params)
+      return browse(5, params)
+    }
+});
+
+status.command({
+    name: "botInstructions",
+    title: 'IDK man',
+    description: 'IDK man',
+    fullscreen: true,
+    onSend: function(params){
+      return browse(6, params)
+    }
+});
+
+status.command({
+    name: "inviteFriends",
+    title: 'Invite friends to your group!',
+    description: '"friends"',
+    fullscreen: true,
+    onSend: function(params){
+      return browse(7, params)
+    },
+    preview: function (params) {
+        var text = status.components.text(
+            {
+                style: {
+                    marginTop: -10,
+                    fontSize: 15,
+                    fontFamily: "font",
+                    color: "black"
+                }
+            }, "Not that you have any friends");
+        return {markup: status.components.view({}, [text])};
+    }
+});
+
+status.command({
+    name: "PlaceBet",
+    title: 'betting page',
+    description: 'the reason you are here!',
+    fullscreen: true,
+    onSend: function(params){
+      return browse(8, params)
+    },
+    preview: function (params) {
+        var text = status.components.text(
+            {
+                style: {
+                    marginTop: -10,
+                    fontSize: 15,
+                    fontFamily: "font",
+                    color: "black"
+                }
+            }, "The real reason you are here. lets be honest");
+        return {markup: status.components.view({}, [text])};
+    }
+});
+
+status.command({
+    name: "ViewGroup",
+    title: 'view the groups you are part of',
+    description: 'this is true  ',
+    fullscreen: true,
+    onSend: function(params){
+      return browse(9, params)
     }
 });
 
@@ -77,90 +155,27 @@ status.command({
     name: "setUser",
     title: 'Set User',
     description: 'Change the user that is acting on the dapp.',
-    fullscreen: true,
     params: [
       {
         // TODO: select user from a list here.
           name: "account",
           type: status.types.NUMBER,
-          placeholder: "type in the account address you want to use."
+          placeholder: "account address",
       }
-    ]
+    ],
+    preview: function (params) {
+        var text = status.components.text(
+            {
+                style: {
+                    marginTop: -10,
+                    fontSize: 15,
+                    fontFamily: "font",
+                    color: "black"
+                }
+            }, "You have successfully selected user " + usersIndex);
+        return {markup: status.components.view({}, [text])};
+    }
     onSend: function(params){
       usersIndex = params.account
     }
 });
-// // Sources/references: https://github.com/makoto/gtt/blob/master/docs/bots/welcome.js
-//
-// var usersIndex = 0
-//
-// status.addListener("init", function () {
-//   return {"text-message": "Welcome to Genesis Token Tracker. ʕ•͡ᴥ•ʔ"};
-// });
-//
-// function browse(command, params){
-//   var host = 'http://localhost:3000/'
-//   var url = host + '#junk&' + usersIndex + '&' + page
-//   return {
-//     title: "Browser",
-//     dynamicTitle: true,
-//     singleLineInput: true,
-//     actions: [ { type: status.actions.FULLSCREEN } ],
-//     markup: status.components.bridgedWebView(url)
-//   };
-// }
-//
-// status.command({
-//     name: "create",
-//     title: 'SGT token holder leaderboard',
-//     description: 'Browse SGT token holder leaderboard',
-//     fullscreen: true,
-//     params: [
-//       {
-//           name: "account",
-//           type: status.types.TEXT,
-//           placeholder: "SGT holding account address"
-//       }
-//     ],
-//     onSend: function(params){
-//       return browse('leaderboard', params)
-//     }
-// });
-//
-// status.command({
-//   // TODO: make this go straight to the page
-//     name: "myGroups",
-//     title: 'SGT token holder distribution',
-//     description: 'Browse SGT token holder distribution histogram',
-//     fullscreen: true,
-//     params: [
-//       {
-//           name: "account",
-//           type: status.types.TEXT,
-//           placeholder: "Ss"
-//       }
-//     ],
-//     onSend: function(params){
-//       return browse(2, params)
-//     }
-// });
-//
-// status.command({
-//     name: "setUser",
-//     title: 'Set User',
-//     description: 'Change the user that is acting on the dapp.',
-//     fullscreen: true,
-//     params: [
-//       {
-//         // TODO: select user from a list here.
-//           name: "userNum",
-//           type: status.types.NUMBER,
-//           placeholder: "type in the account address you want to use."
-//       }
-//     ]
-//     onSend: function(params){
-//       setAccountNum = params.userNum
-//       console.log('user number changed' + setAccountNum)
-//       return browse(0, params) // TODO: Cary add reply...
-//     }
-// });

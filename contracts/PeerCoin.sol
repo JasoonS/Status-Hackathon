@@ -103,7 +103,6 @@ contract PeerCoin {
     groups[gid].groupBets[bgname].exists = true;
     groups[gid].groupBets[bgname].name = bgname;
     groups[gid].groupBets[bgname].description = bgdescription;
-    groups[gid].groupBets[bgname].participants.push(msg.sender);
     groups[gid].groupBetsArray.push(bgname);
     return true;
   }
@@ -119,7 +118,8 @@ contract PeerCoin {
       group.groupBets[bgid].bets[msg.sender].amount = bamount;
       group.groupBets[bgid].bets[msg.sender].isOpen = true;
       group.groupBets[bgid].bets[msg.sender].exists = true;
-
+      group.groupBets[bgid].participants.push(msg.sender);
+      groups[gid].balances[msg.sender] -= int(bamount);
       groups[gid] = group;
   }
 
@@ -147,6 +147,7 @@ contract PeerCoin {
   }
 
   function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
+    users[newMember].numberOfPendingBets++;
     users[newMember].groupInvites.push(gid);
     users[newMember].pendingInvite[gid] = true;
     users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
@@ -157,6 +158,7 @@ contract PeerCoin {
   function acceptInvite(bytes32 gid) {
     if (!groups[gid].isMember[msg.sender] && users[msg.sender].pendingInvite[gid]) { // TODO:: do exists check also
       users[msg.sender].pendingInvite[gid] = true;
+      users[msg.sender].numberOfPendingBets--;
     }
   }
 

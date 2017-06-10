@@ -37,6 +37,7 @@ contract PeerCoin {
     bytes32[] groupBets;
     bytes32[] groupInvites;
     mapping (bytes32 => bool) pendingInvite;
+    uint numberOfPendingBets; //Ugly but it had to be done
     bool exists;
   }
 
@@ -69,6 +70,21 @@ contract PeerCoin {
     } else {
       return false;
     }
+  }
+
+  function listAllInvitiations(address addr) returns (bytes32[] invitations){
+        return users[addr].groupInvites;
+  }
+
+  function listPendingInvites(address addr) returns (bytes32[] memory invitations){
+      invitations = new bytes32[](users[addr].numberOfPendingBets);
+      uint count = 0;
+      bytes32[] memory allInvites = listAllInvitiations(addr);
+      for(uint i = 0; i < allInvites.length; i++){
+          if(users[addr].pendingInvite[allInvites[i]]){
+            invitations[count++] = (allInvites[i]);
+          }
+      }
   }
 
   mapping (address => Bet) bets;
@@ -226,7 +242,7 @@ contract PeerCoin {
 
   }
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
-    //assert(groups[gid].isMember(toAdr));
+    assert(groups[gid].isMember[toAdr]);
     groups[gid].balances[msg.sender] = groups[gid].balances[msg.sender] - int(amount);
     groups[gid].balances[toAdr] = groups[gid].balances[toAdr] + int(amount);
     return groups[gid].balances[msg.sender];

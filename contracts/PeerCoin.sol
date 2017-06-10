@@ -13,7 +13,8 @@ contract PeerCoin {
     mapping (address => int) balances;
     mapping (address => bool) isMember; //test if person is a member of the group
     address[] members; //an array to easily iterate through the members
-    /*mapping (bytes32 => GroupBets) bets;*/
+    mapping (bytes32 => GroupBets) groupBets;
+    bytes32[] groupBetsArray;
     bytes32[] bets;
     bytes32 name;
     bool exists;
@@ -70,6 +71,42 @@ contract PeerCoin {
     }
   }
 
+  mapping (address => Bet) bets;
+    address[] participants;
+    bytes32 name;
+    bytes32 description;
+    bool exists;
+
+  function addBetGroup (bytes32 bgname, bytes32 bgdescription, bytes32 gid) returns( bool ){
+    assert(groups[gid].exists);
+    if(groups[gid].groupBets[bgname].exists){
+        //bet group allready exists inside of the group
+        return false;
+    }
+    users[msg.sender].groupBets.push(bgname);
+    groups[gid].groupBets[bgname].exists = true;
+    groups[gid].groupBets[bgname].name = bgname;
+    groups[gid].groupBets[bgname].description = bgdescription;
+    groups[gid].groupBets[bgname].participants.push(msg.sender);
+    groups[gid].groupBetsArray.push(bgname);
+    return true;
+  }
+
+  //function that takes in a group, the bet name and the bet description and creates the bet
+  //returning the ID of the bet
+  function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
+      Group group = groups[gid]; //gets the group
+      assert(group.isMember[msg.sender]);
+
+      //creates the bet
+      group.groupBets[bgid].bets[msg.sender].stance = bstance;
+      group.groupBets[bgid].bets[msg.sender].amount = bamount;
+      group.groupBets[bgid].bets[msg.sender].isOpen = true;
+      group.groupBets[bgid].bets[msg.sender].exists = true;
+
+      groups[gid] = group;
+  }
+
   function isGroupIdUsed (bytes32 gid) constant returns( bool ) {
     return groups[gid].exists;
   }
@@ -93,11 +130,12 @@ contract PeerCoin {
     return (groups[gid].bets, groups[gid].members, balances);
   }
 
-  function inviteUser (bytes32 gid, address newMember) /*onlyGroupMember(gid)*/ {
+  function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
     users[newMember].groupInvites.push(gid);
     users[newMember].pendingInvite[gid] = true;
-    users[newMember].groupInvites.push(gid);
-    // this append only, so not scalable if user joins many many groups. But a first step in functionality.
+    users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
+    // Rather store in a server, and check with the previous line if they have an account.
+    // this append only, so not scalable if user joins many many groups.
   }
 
   function acceptInvite(bytes32 gid) {
@@ -130,15 +168,50 @@ contract PeerCoin {
     return (groupIds, groupNames,balances);
   }
 
+  function listGroupBets(address uaddr) constant returns(bytes32[]){
+      bytes32[] memory groupBets = new bytes32[](users[msg.sender].groupBets.length);
+      var(groupIds , , ) = listGroups(uaddr);
+      for(uint i = 0; i < groupIds.length; i++){
+          Group group = groups[groupIds[i]];
+          for(uint j = 0; j < group.groupBetsArray.length; j++){
+                if(group.groupBets[group.groupBetsArray[j]].bets[uaddr].exists){
+                    groupBets[i*j] = (group.groupBetsArray[j]);
+                }
+          }
+
+      }
+      return  groupBets;
+  }
+
+  function listBets(address uaddr) constant returns (bool[],uint[],bytes32[]) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
+      uint length = users[msg.sender].groupBets.length;
+      bool[] memory betsStance = new bool[](length);
+      uint[] memory betsAmount = new uint[](length);
+      bytes32[] memory gidName = new bytes32[](length);
+      var(groupIds , , ) = listGroups(uaddr);
+      uint count = 0;
+      for(uint i = 0; i < groupIds.length; i++){
+          Group group = groups[groupIds[i]];
+          for(uint j = 0; j < group.groupBetsArray.length; j++){
+                if(group.groupBets[group.groupBetsArray[j]].bets[uaddr].exists){
+                    betsStance[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].stance);
+                    betsAmount[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].amount);
+                    gidName[count++] = (group.groupBets[group.groupBetsArray[j]].name);
+                }
+          }
+
+      }
+      return (betsStance,betsAmount,gidName);
+
+  }
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
     groups[gid].balances[msg.sender] = groups[gid].balances[msg.sender] - int(amount);
     groups[gid].balances[toAdr] = groups[gid].balances[toAdr] + int(amount);
     return groups[gid].balances[msg.sender];
   }
 
-  function getbalance(bytes32 gid, address userAdr) constant returns (int balance) {
-      return groups[gid].balances[userAdr];
-      /*return groups[gid].balances[msg.sender];*/
+  function getbalance(bytes32 gid) constant returns (int balance) {
+      return groups[gid].balances[msg.sender];
   }
 
   //for debugging:

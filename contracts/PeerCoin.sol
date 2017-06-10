@@ -168,8 +168,29 @@ contract PeerCoin {
     return (groupIds, groupNames,balances);
   }
 
-  function listGroupBets(address uaddr) constant returns(bytes32[]){
-      bytes32[] memory groupBets = new bytes32[](users[msg.sender].groupBets.length);
+  function listBetsByGID(bytes32 gid) returns (bytes32[] groupBet) {
+      Group group = groups[gid];
+      groupBet = new bytes32[](group.groupBetsArray.length);
+      for(uint j = 0; j < group.groupBetsArray.length; j++){
+            if(group.groupBets[group.groupBetsArray[j]].exists){
+                groupBet[j] = (group.groupBetsArray[j]);
+            }
+
+        }
+  }
+
+  function listMembers(bytes32 gid) returns (address[] memberID, int[] amount){
+      Group group = groups[gid];
+      memberID = new address[](group.members.length);
+      amount = new int[](group.members.length);
+      for(uint j = 0; j < group.members.length; j++){
+            memberID[j] = group.members[j];
+            amount[j] = group.balances[group.members[j]];
+        }
+  }
+
+  function listGroupBets(address uaddr) constant returns(bytes32[] groupBets){
+      groupBets = new bytes32[](users[msg.sender].groupBets.length);
       var(groupIds , , ) = listGroups(uaddr);
       for(uint i = 0; i < groupIds.length; i++){
           Group group = groups[groupIds[i]];
@@ -183,8 +204,8 @@ contract PeerCoin {
       return  groupBets;
   }
 
-  function listBets(address uaddr) constant returns (bool[],uint[],bytes32[]) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
-      uint length = users[msg.sender].groupBets.length;
+  function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
+      uint length = users[uaddr].groupBets.length;
       bool[] memory betsStance = new bool[](length);
       uint[] memory betsAmount = new uint[](length);
       bytes32[] memory gidName = new bytes32[](length);
@@ -205,6 +226,7 @@ contract PeerCoin {
 
   }
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
+    //assert(groups[gid].isMember(toAdr));
     groups[gid].balances[msg.sender] = groups[gid].balances[msg.sender] - int(amount);
     groups[gid].balances[toAdr] = groups[gid].balances[toAdr] + int(amount);
     return groups[gid].balances[msg.sender];

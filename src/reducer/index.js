@@ -5,7 +5,7 @@ import {
 const initialState = {
   peerCoinLoaded: false,
   groupDataLoaded: false,
-  screen: 4
+  screen: 2
 }
 
 const reducer = (state = initialState, action) => {
@@ -61,6 +61,13 @@ const reducer = (state = initialState, action) => {
         screen: 7,
         curGroupId: action.groupID,
         screenContext: action.screenContext
+      }
+    case actions.VIEW_GROUP:
+      console.log('screen', action)
+      return {
+        ...state,
+        screen: 9,
+        curGroupId: action.curGroupId,
       }
     case actions.FINISH_INVITE:
       return {

@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {loadUsersGroups} from '../actions'
+import {loadUsersGroups, loadGroupDetails} from '../actions'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
@@ -20,13 +20,17 @@ class MyGroups extends Component {
   }
 
   componentWillMount() {
-    console.log('saving load user groups')
     this.props.dispatch(
-      loadUsersGroups(this.props.peerCoinInstance, this.props.addresses[this.props.accountNum])
+      loadUsersGroups(this.props.peerCoinInstance, this.props.userAddresses[this.props.accountNum])
     )
   }
 
   render() {
+    const {
+      groupData,
+      dispatch,
+      peerCoinInstance
+    } = this.props
     const groups = () => {
       if (this.props.groupDataLoaded){
         // const {groupData: {groupIDs, groupNames, groupBalance}} = this.props.groupData
@@ -35,20 +39,24 @@ class MyGroups extends Component {
             <TableRowColumn>{gID}</TableRowColumn>
             <TableRowColumn>{this.props.groupData.groupNames[i]}</TableRowColumn>
             <TableRowColumn>{this.props.groupData.groupBalance[i]}</TableRowColumn>
-            <TableRowColumn><RaisedButton label="View" primary={true} /></TableRowColumn>
           </TableRow>
         )
+        // <TableRowColumn><RaisedButton label="View" primary={true} /></TableRowColumn>
       } else {
         return ''
       }
     }
-
+    const loadGroupDetailsBtn = (groupIndex) => {
+      const gid = groupData.groupIDs[groupIndex]
+      console.log(gid, 'is the group id')
+      dispatch(loadGroupDetails(peerCoinInstance, gid))
+    }
     return (
       <div className="MyBets">
         <h1>My Groups</h1>
         <p>The following are groups you belong to as well as group invites.</p>
         <div>
-          <Table height='300px'>
+        <Table height='300px' onCellClick={(row) => loadGroupDetailsBtn(row)}>
             <TableHeader>
               <TableRow>
               <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
@@ -73,7 +81,7 @@ const mapStateToProps = state => {
     peerCoinLoaded: state.peerCoinLoaded,
     peerCoinInstance: state.peerCoinInstance,
     groupDataLoaded: state.groupDataLoaded,
-    addresses: state.addresses,
+    userAddresses: state.userAddresses,
     accountNum: state.accountNum,
     groupData: state.groupData
    }

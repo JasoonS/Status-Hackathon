@@ -13,6 +13,7 @@ export const actions = {
   SET_ACCOUNT_NUM: 'SET_ACCOUNT_NUM',
   START_INVITE: 'START_INVITE',
   FINISH_INVITE: 'FINISH_INVITE',
+  VIEW_GROUP: 'VIEW_GROUP',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -38,9 +39,9 @@ export const loadPeerCoinInstanceAndUserAddress = () => {
   }
 }
 
-export const loadUsersGroups = (peerCoinInstance) => {
+export const loadUsersGroups = (peerCoinInstance, account) => {
   return dispatch => {
-    peerCoinInstance.listGroups().then(function(result) {
+    peerCoinInstance.listGroups(account).then(function(result) {
       let groupData = {
         groupIDs: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
         groupNames: result[1].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
@@ -81,13 +82,15 @@ export const inviteUsers = (peerCoinInstance, gid, userAddresses, usersIndexList
 
 export const loadGroupDetails = (peerCoinInstance, gid) => {
   return dispatch => {
-    peerCoinInstance.listGroups().then(function(result) {
-      let groupData = {
-        groupIDs: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
-        groupNames: result[1].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
-        groupBalance: String(result[2]).split(',')
-      }
-      dispatch(saveUsersGroups(groupData))
+    dispatch(viewGroup(gid))
+    peerCoinInstance.getGroupInfo(gid).then(function(result) {
+      console.log(result)
+      // let groupData = {
+      //   groupIDs: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
+      //   groupNames: result[1].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
+      //   groupBalance: String(result[2]).split(',')
+      // }
+      // dispatch(saveUsersGroups(groupData))
     })
   }
 }
@@ -149,6 +152,11 @@ export const startingCreateNewGroup = () => ({
 
 export const finishCreateGroup = () => ({
   type: actions.CREATED_GROUP
+})
+
+export const viewGroup = (curGroupId) => ({
+  type: actions.VIEW_GROUP,
+  curGroupId
 })
 
 export const loadGroupInvites = (groupID, screenContext) =>{

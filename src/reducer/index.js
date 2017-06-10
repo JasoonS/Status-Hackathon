@@ -15,34 +15,28 @@ const initialState = {
 const reducer = (state = initialState, action) => {
   switch (action.type) {
     case actions.SET_SCREEN:
-      console.log('set screeeeeeen', action.windowNum)
       return {
         ...state,
         screen: action.windowNum
       }
     case actions.SET_ACCOUNT_NUM:
-      console.log('set account num', action.windowNum)
       return {
         ...state,
         accountNum: action.accountNum,
         accountIsSelected: true
       }
     case actions.SAVE_USER_ADDRESS:
-      console.log('userAddress', action.userAddresses)
       return {
         ...state,
         userAddresses: action.userAddresses
       }
     case actions.SAVE_PEER_COIN:
-      console.log('SAVE_PEER_COIN')
       return {
         ...state,
         peerCoinLoaded: true,
         peerCoinInstance: action.peerCoinInstance
       }
     case actions.SAVE_USER_GROUPS:
-      console.log('SAVE_USER_GROUPS')
-      console.log(action.groupData)
       return {
         ...state,
         groupData: action.groupData,
@@ -59,7 +53,6 @@ const reducer = (state = initialState, action) => {
         busyCreatingGroup: false
       }
     case actions.LOAD_GROUP_INVITE:
-      console.log('screen', action)
       return {
         ...state,
         screen: 7,
@@ -67,14 +60,25 @@ const reducer = (state = initialState, action) => {
         screenContext: action.screenContext
       }
     case actions.LOAD_BETS_LIST:
-      console.log('screen', action)
       return {
         ...state,
         openBets: action.openBetsInfo.id,
         openBetsInfo: action.openBetsInfo
       }
+    case actions.LOAD_GBETS_LIST:
+      console.log('LOAD_GBETS_LIST', action)
+      return {
+        ...state,
+        openGroupBets: action.groupBetsInfo.id,
+        groupBetsInfo: action.groupBetsInfo
+      }
+    case actions.LOAD_GROUP_INFO:
+      return {
+        ...state,
+        groupMembers: action.groupInfo.address,
+        groupInfo: action.groupInfo
+      }
     case actions.VIEW_GROUP:
-      console.log('screen', action)
       return {
         ...state,
         screen: 9,

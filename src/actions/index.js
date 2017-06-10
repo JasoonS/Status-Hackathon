@@ -16,6 +16,8 @@ export const actions = {
   VIEW_GROUP: 'VIEW_GROUP',
   CREATE_BET_PAGE: 'CREATE_BET_PAGE',
   LOAD_BETS_LIST: 'LOAD_BETS_LIST',
+  LOAD_GBETS_LIST: 'LOAD_GBETS_LIST',
+  LOAD_GROUP_INFO: 'LOAD_GROUP_INFO',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -65,6 +67,32 @@ export const loadUsersBets = (peerCoinInstance, account) => {
       }
       console.log(betData)
       dispatch(saveLoadBetsList(betData))
+    })
+  }
+}
+
+export const loadGroupsBets = (peerCoinInstance, gid) => {
+  return dispatch => {
+    peerCoinInstance.listBetsByGID(gid).then(function(result) {
+      let betData = {
+        id: result/*[0]*/.map(i => window.web3.toAscii(i).replace(/\u0000/g, ''))
+      }
+      dispatch(saveGroupBetsList(betData))
+    })
+  }
+}
+
+export const loadGroupInfo = (peerCoinInstance, gid) => {
+  return dispatch => {
+    peerCoinInstance.getGroupInfo(gid).then(function(result) {
+      console.log(result)
+      let betData = {
+        // id: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, ''))
+        address: result[1],
+        balance: String(result[2]).split(',')
+      }
+      console.log(betData)
+      dispatch(saveGroupInfo(betData))
     })
   }
 }
@@ -136,6 +164,16 @@ export const saveLoadBetsList = (openBetsInfo) => ({
   openBetsInfo
 })
 
+export const saveGroupInfo = (groupInfo) => ({
+  type: actions.LOAD_GROUP_INFO,
+  groupInfo
+})
+
+export const saveGroupBetsList = (groupBetsInfo) => ({
+  type: actions.LOAD_GBETS_LIST,
+  groupBetsInfo
+})
+
 // currently inactive...
 export const startInviting = () => ({ // TODO: using a counter to tell when inviting is done is very hacky... Fix
   type: actions.START_INVITE
@@ -146,7 +184,7 @@ export const finishInviting = (gid) => ({ // TODO: using a counter to tell when 
   gid
 })
 
-// export const inviteUser = (userAddresses) => ({ // TODO: using a counter to tell when inviting is done is very hacky... Fix
+// export const inviteUser = (userAddresses) => ({
 //   type: actions.START_INVITE,
 //   userAddresses
 // })

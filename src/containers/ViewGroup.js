@@ -10,21 +10,24 @@ import {
 } from 'material-ui/Table'
 import { connect } from 'react-redux'
 import RaisedButton from 'material-ui/RaisedButton'
-import {loadGroupInvites, goToCreateBet} from '../actions'
+import {loadGroupInvites, goToCreateBet, loadGroupsBets, loadGroupInfo} from '../actions'
 
 class ViewGroup extends Component {
   constructor(props) {
     super(props)
   }
   componentWillMount () {
-    // dispatch(load)
+    this.props.dispatch(loadGroupsBets(this.props.peerCoinInstance, this.props.curGroupId))
+    this.props.dispatch(loadGroupInfo(this.props.peerCoinInstance, this.props.curGroupId))
   }
   render() {
     const {
       curGroupId,
       groupMembers,
       openGroupBets,
-      dispatch
+      groupBetsInfo,
+      dispatch,
+      groupInfo
     } = this.props
     const inviteFriendsBtn = () => {
       dispatch(loadGroupInvites(curGroupId, 'viewGroup'))
@@ -32,16 +35,16 @@ class ViewGroup extends Component {
     const createGroupBtn = () => {
       dispatch(goToCreateBet(curGroupId))
     }
-    const openGroupBetsRows = groupMembers.map((id, i) =>
+    const openGroupBetsRows = openGroupBets.map((id, i) =>
       <TableRow key={i} >
         <TableRowColumn>{id}</TableRowColumn>
-        <TableRowColumn>{id}</TableRowColumn>
+        <TableRowColumn>{groupBetsInfo.id[i]}</TableRowColumn>
       </TableRow>
     )
-    const groupMembersRows = openGroupBets.map((id, i) =>
+    const groupMembersRows = groupMembers.map((id, i) =>
       <TableRow key={i} >
         <TableRowColumn>{id}</TableRowColumn>
-        <TableRowColumn>{id}</TableRowColumn>
+        <TableRowColumn>{groupInfo.balance[i]}</TableRowColumn>
       </TableRow>
     )
     return (
@@ -53,27 +56,27 @@ class ViewGroup extends Component {
         <RaisedButton onTouchTap={createGroupBtn} label='Create Bet' primary={true} fullWidth={true}/>
         {/*table for active bets*/}
         <h3>Active Bets</h3>
-        <Table onRowSelection={this.selectFriends} displayRowCheckbox={false}>
-          <TableHeader>
+        <Table onRowSelection={this.selectFriends}>
+          <TableHeader displayRowCheckbox={false}>
             <TableRow>
               <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
               <TableHeaderColumn tooltip="Friend Address">Friend Address</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody showRowHover={true}>
+          <TableBody showRowHover={true} displayRowCheckbox={false}>
             {openGroupBetsRows}
           </TableBody>
         </Table>
         {/*table for users groups*/}
         <h3>Group Members</h3>
-        <Table height='300px' onRowSelection={this.selectFriends} displayRowCheckbox={false}>
-          <TableHeader>
+        <Table height='300px' onRowSelection={this.selectFriends}>
+          <TableHeader displayRowCheckbox={false}>
             <TableRow>
               <TableHeaderColumn tooltip="User Address">User</TableHeaderColumn>
               <TableHeaderColumn tooltip="Users Balance">Balance</TableHeaderColumn>
             </TableRow>
           </TableHeader>
-          <TableBody showRowHover={true}>
+          <TableBody showRowHover={true} displayRowCheckbox={false}>
             {groupMembersRows}
           </TableBody>
         </Table>
@@ -86,7 +89,10 @@ const mapStateToProps = state => {
   return {
     curGroupId: state.curGroupId,
     groupMembers: state.groupMembers,
-    openGroupBets: state.openGroupBets
+    openGroupBets: state.openGroupBets,
+    groupBetsInfo: state.groupBetsInfo,
+    peerCoinInstance: state.peerCoinInstance,
+    groupInfo: state.groupInfo
    }
 }
 export default connect(mapStateToProps)(ViewGroup)

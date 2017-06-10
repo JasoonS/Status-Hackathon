@@ -2,12 +2,22 @@ pragma solidity ^0.4.8;
 
 contract PeerCoin {
 
-  event GroupGet(
+    event GroupGet(
     address indexed _from,
     bytes32 indexed _name,
     bytes32 indexed _id,
     int _balance
   );
+
+  modifier onlyGroupMember(bytes32 gid) {
+    if (!groups[gid].isMember[msg.sender]) {
+      throw;
+    }
+    _;
+  }
+
+  mapping (bytes32 => Group) public groups;
+  mapping (address => User) public users;
 
   struct Group {
     mapping (address => int) balances;
@@ -19,37 +29,42 @@ contract PeerCoin {
     bytes32 name;
     bool exists;
   }
+
   struct GroupBets {
     mapping (address => Bet) bets;
     address[] participants;
     bytes32 name;
     bytes32 description;
     bool exists;
+
+    bytes32 state;
+    address creator;
+
+    uint tokensFor;
+    uint tokensAgainst;
+
+    uint forVote;
+    uint againstVote;
+
+    mapping(address => bool) voted;
   }
-  struct Bet {
+
+ struct Bet {
     bool stance;
     uint amount;
     bool isOpen;
     bool exists;
   }
+
   struct User {
     bytes32[] groups;
     bytes32[] groupBets;
     bytes32[] groupInvites;
-    mapping (bytes32 => bool) pendingInvite;
     uint numberOfPendingBets; //Ugly but it had to be done
+    mapping (bytes32 => bool) pendingInvite;
     bool exists;
   }
 
-  mapping (bytes32 => Group) public groups;
-  mapping (address => User) public users;
-
-  modifier onlyGroupMember(bytes32 gid) {
-    if (!groups[gid].isMember[msg.sender]) {
-      throw;
-    }
-    _;
-  }
 
   function createGroup (bytes32 gname, bytes32 gid) returns (bool) {
     if(!groups[gid].exists) {
@@ -72,27 +87,6 @@ contract PeerCoin {
     }
   }
 
-  function listAllInvitiations(address addr) returns (bytes32[] invitations){
-        return users[addr].groupInvites;
-  }
-
-  function listPendingInvites(address addr) returns (bytes32[] memory invitations){
-      invitations = new bytes32[](users[addr].numberOfPendingBets);
-      uint count = 0;
-      bytes32[] memory allInvites = listAllInvitiations(addr);
-      for(uint i = 0; i < allInvites.length; i++){
-          if(users[addr].pendingInvite[allInvites[i]]){
-            invitations[count++] = (allInvites[i]);
-          }
-      }
-  }
-
-  mapping (address => Bet) bets;
-    address[] participants;
-    bytes32 name;
-    bytes32 description;
-    bool exists;
-
   function addBetGroup (bytes32 bgname, bytes32 bgdescription, bytes32 gid) returns( bool ){
     assert(groups[gid].exists);
     if(groups[gid].groupBets[bgname].exists){
@@ -103,28 +97,36 @@ contract PeerCoin {
     groups[gid].groupBets[bgname].exists = true;
     groups[gid].groupBets[bgname].name = bgname;
     groups[gid].groupBets[bgname].description = bgdescription;
+    groups[gid].groupBets[bgname].state = "voting";
     groups[gid].groupBetsArray.push(bgname);
     return true;
   }
 
-  //function that takes in a group, the bet name and the bet description and creates the bet
-  //returning the ID of the bet
-  function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
-      Group group = groups[gid]; //gets the group
-      assert(group.isMember[msg.sender]);
 
+  function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
+
+      Group group = groups[gid]; //gets the group
+      require(group.isMember[msg.sender]);
+      require(group.groupBets[bgid].state == "voting");
+      require(!group.groupBets[bgid].bets[msg.sender].exists);
       //creates the bet
       group.groupBets[bgid].bets[msg.sender].stance = bstance;
-      group.groupBets[bgid].bets[msg.sender].amount = bamount;
+      group.groupBets[bgid].bets[msg.sender].amount = 1000; //hardcoded this as rounding errors and etc might be tricky later on
       group.groupBets[bgid].bets[msg.sender].isOpen = true;
       group.groupBets[bgid].bets[msg.sender].exists = true;
       group.groupBets[bgid].participants.push(msg.sender);
-      groups[gid].balances[msg.sender] -= int(bamount);
+      group.balances[msg.sender] -= int(bamount);
+      if(bstance){
+          group.groupBets[bgid].tokensFor += 1000;
+      }else{
+          group.groupBets[bgid].tokensAgainst += 1000;
+      }
       groups[gid] = group;
   }
 
-  function isGroupIdUsed (bytes32 gid) constant returns( bool ) {
-    return groups[gid].exists;
+  function changeState(bytes32 bgid, bytes32 gid){
+      assert(groups[gid].groupBets[bgid].creator == msg.sender);
+      groups[gid].groupBets[bgid].state = "voting";
   }
 
   function addToUsersGroup (bytes32 gid) internal {
@@ -135,24 +137,75 @@ contract PeerCoin {
     groups[gid].isMember[msg.sender] = true;
   }
 
-  function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
-    uint length = groups[gid].members.length;
-    int[] memory balances = new int[](length);
-    for (uint i = 0; i < length; i++) {
-      address curMember = groups[gid].members[i];
-
-      balances[i] = groups[gid].balances[curMember];
-    }
-    return (groups[gid].bets, groups[gid].members, balances);
-  }
-
   function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
-    users[newMember].numberOfPendingBets++;
-    users[newMember].groupInvites.push(gid);
+    // users[newMember].groupInvites.push(gid);
     users[newMember].pendingInvite[gid] = true;
+    users[newMember].numberOfPendingBets++;
     users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
     // Rather store in a server, and check with the previous line if they have an account.
     // this append only, so not scalable if user joins many many groups.
+  }
+
+    function settleBet(bytes32 gid, bytes32 bgid, bool position){
+      require(groups[gid].groupBets[bgid].state == "voting");
+      require(groups[gid].groupBets[bgid].bets[msg.sender].exists);
+      require(!groups[gid].groupBets[bgid].voted[msg.sender]);
+
+      if(position){
+          groups[gid].groupBets[bgid].forVote++;
+      }else{
+          groups[gid].groupBets[bgid].againstVote++;
+      }
+      uint total = groups[gid].groupBets[bgid].participants.length;
+      uint amountToPayOut = 0;
+      if(groups[gid].groupBets[bgid].forVote > total/2){
+          //for vote wins
+          amountToPayOut = (groups[gid].groupBets[bgid].tokensFor + groups[gid].groupBets[bgid].tokensAgainst)/(groups[gid].groupBets[bgid].tokensFor/1000);
+          for(uint i = 0; i < groups[gid].groupBets[bgid].participants.length; i++){
+             if(groups[gid].groupBets[bgid].bets[groups[gid].groupBets[bgid].participants[i]].stance){
+                groups[gid].balances[groups[gid].groupBets[bgid].participants[i]] += int(amountToPayOut);
+             }
+         }
+       groups[gid].groupBets[bgid].state == "closed";
+      }else if(groups[gid].groupBets[bgid].againstVote > total/2){
+          //against vote wins
+          amountToPayOut = (groups[gid].groupBets[bgid].tokensAgainst + groups[gid].groupBets[bgid].tokensFor)/(groups[gid].groupBets[bgid].tokensAgainst/1000);
+          for(uint j = 0; j < groups[gid].groupBets[bgid].participants.length; j++){
+              if(!groups[gid].groupBets[bgid].bets[groups[gid].groupBets[bgid].participants[j]].stance){
+                    groups[gid].balances[groups[gid].groupBets[bgid].participants[j]] += int(amountToPayOut);
+              }
+          }
+          groups[gid].groupBets[bgid].state == "closed";
+
+      }else if(groups[gid].groupBets[bgid].againstVote + groups[gid].groupBets[bgid].forVote == total){
+          //it is a draw
+          for(uint k = 0; j < groups[gid].groupBets[bgid].participants.length; k++){
+                    groups[gid].balances[groups[gid].groupBets[bgid].participants[k]] += 1000;
+          }
+
+          groups[gid].groupBets[bgid].state == "closed";
+      }
+  }
+
+    function listAllInvitiations(address addr) constant returns (bytes32[] invitations, bool[] pending){
+        uint length = users[addr].groupInvites.length;
+        invitations = new bytes32[](length);
+        pending = new bool[](length);
+        for(uint i = 0; i < length;i++){
+            invitations[i] = users[addr].groupInvites[i];
+            pending[i] = users[addr].pendingInvite[invitations[i]];
+        }
+        return (invitations,pending);
+  }
+
+  function listPendingInvites(address addr) constant returns (bytes32[] invitations){
+      invitations = new bytes32[](users[addr].numberOfPendingBets);
+      uint count = 0;
+      for(uint i = 0; i < users[addr].groupInvites.length; i++){
+          if(users[addr].pendingInvite[users[addr].groupInvites[i]]){
+            invitations[count++] = (users[addr].groupInvites[i]);
+          }
+      }
   }
 
   function acceptInvite(bytes32 gid) {
@@ -162,7 +215,10 @@ contract PeerCoin {
     }
   }
 
-  // TODO: Add balance int[] as a return types
+  function isGroupIdUsed (bytes32 gid) constant returns( bool ) {
+    return groups[gid].exists;
+  }
+
   function listGroups(address uaddr) constant returns (bytes32[],bytes32[],int[]) {
 //   function listGroups() constant returns (uint length) {
     /*uint length = people.length;*/
@@ -186,18 +242,22 @@ contract PeerCoin {
     return (groupIds, groupNames,balances);
   }
 
-  function listBetsByGID(bytes32 gid) returns (bytes32[] groupBet) {
+  function listBetsByGID(bytes32 gid) constant returns (bytes32[] groupBet,uint[] forT, uint[] againstT) {
       Group group = groups[gid];
       groupBet = new bytes32[](group.groupBetsArray.length);
+      forT = new uint[](group.groupBetsArray.length);
+      againstT = new uint[](group.groupBetsArray.length);
       for(uint j = 0; j < group.groupBetsArray.length; j++){
             if(group.groupBets[group.groupBetsArray[j]].exists){
                 groupBet[j] = (group.groupBetsArray[j]);
+                forT[j] = group.groupBets[groupBet[j]].tokensFor;
+                againstT[j] = group.groupBets[groupBet[j]].tokensAgainst;
             }
 
         }
   }
 
-  function listMembers(bytes32 gid) returns (address[] memberID, int[] amount){
+  function listMembers(bytes32 gid) constant returns (address[] memberID, int[] amount){
       Group group = groups[gid];
       memberID = new address[](group.members.length);
       amount = new int[](group.members.length);
@@ -207,19 +267,23 @@ contract PeerCoin {
         }
   }
 
-  function listGroupBets(address uaddr) constant returns(bytes32[] groupBets){
+  function listGroupBets(address uaddr) constant returns(bytes32[] groupBets, bytes32[] groupID, bytes32[] groupBetsDiscription){
       groupBets = new bytes32[](users[msg.sender].groupBets.length);
+      groupID = new bytes32[](users[msg.sender].groupBets.length);
+      groupBetsDiscription  = new bytes32[](users[msg.sender].groupBets.length);
       var(groupIds , , ) = listGroups(uaddr);
       for(uint i = 0; i < groupIds.length; i++){
           Group group = groups[groupIds[i]];
           for(uint j = 0; j < group.groupBetsArray.length; j++){
                 if(group.groupBets[group.groupBetsArray[j]].bets[uaddr].exists){
                     groupBets[i*j] = (group.groupBetsArray[j]);
+                    groupID[i*j] = (group.name);
+                    groupBetsDiscription[i*j] = (group.groupBets[group.groupBetsArray[j]].description);
                 }
           }
 
       }
-      return  groupBets;
+      return  (groupBets,groupID,groupBetsDiscription);
   }
 
   function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
@@ -243,8 +307,10 @@ contract PeerCoin {
       return (betsStance,betsAmount,gidName);
 
   }
+
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
-    assert(groups[gid].isMember[toAdr]);
+    require(groups[gid].isMember[toAdr]);
+    require(groups[gid].isMember[msg.sender]);
     groups[gid].balances[msg.sender] = groups[gid].balances[msg.sender] - int(amount);
     groups[gid].balances[toAdr] = groups[gid].balances[toAdr] + int(amount);
     return groups[gid].balances[msg.sender];
@@ -258,4 +324,5 @@ contract PeerCoin {
   function getSenderAddress() constant returns (address) {
       return msg.sender;
   }
+
 }

@@ -5,7 +5,11 @@ import {
 const initialState = {
   peerCoinLoaded: false,
   groupDataLoaded: false,
-  screen: 2
+  screen: 3,
+  openBets: [],
+  openGroupBets: [],
+  groupMembers: []
+  // yourBets: []
 }
 
 const reducer = (state = initialState, action) => {
@@ -61,6 +65,13 @@ const reducer = (state = initialState, action) => {
         screen: 7,
         curGroupId: action.groupID,
         screenContext: action.screenContext
+      }
+    case actions.LOAD_BETS_LIST:
+      console.log('screen', action)
+      return {
+        ...state,
+        openBets: action.openBetsInfo.id,
+        openBetsInfo: action.openBetsInfo
       }
     case actions.VIEW_GROUP:
       console.log('screen', action)

@@ -52,7 +52,7 @@ class MyGroups extends Component {
       dispatch(loadGroupDetails(peerCoinInstance, gid))
     }
     return (
-      <div className="MyBets">
+      <div className="MyGroups">
         <h1>My Groups</h1>
         <p>The following are groups you belong to as well as group invites.</p>
         <div>

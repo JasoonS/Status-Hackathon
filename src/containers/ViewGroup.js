@@ -16,9 +16,14 @@ class ViewGroup extends Component {
   constructor(props) {
     super(props)
   }
+  componentWillMount () {
+    // dispatch(load)
+  }
   render() {
     const {
       curGroupId,
+      groupMembers,
+      openGroupBets,
       dispatch
     } = this.props
     const inviteFriendsBtn = () => {
@@ -27,13 +32,13 @@ class ViewGroup extends Component {
     const createGroupBtn = () => {
       dispatch(goToCreateBet(curGroupId))
     }
-    const openBets = ['a','b'].map((id, i) =>
+    const openGroupBetsRows = groupMembers.map((id, i) =>
       <TableRow key={i} >
         <TableRowColumn>{id}</TableRowColumn>
         <TableRowColumn>{id}</TableRowColumn>
       </TableRow>
     )
-    const groupMembers = ['mem1','mem2'].map((id, i) =>
+    const groupMembersRows = openGroupBets.map((id, i) =>
       <TableRow key={i} >
         <TableRowColumn>{id}</TableRowColumn>
         <TableRowColumn>{id}</TableRowColumn>
@@ -46,9 +51,8 @@ class ViewGroup extends Component {
         <br />
         <br />
         <RaisedButton onTouchTap={createGroupBtn} label='Create Bet' primary={true} fullWidth={true}/>
-        <br />
-        <br />
         {/*table for active bets*/}
+        <h3>Active Bets</h3>
         <Table onRowSelection={this.selectFriends} displayRowCheckbox={false}>
           <TableHeader>
             <TableRow>
@@ -57,7 +61,7 @@ class ViewGroup extends Component {
             </TableRow>
           </TableHeader>
           <TableBody showRowHover={true}>
-            {openBets}
+            {openGroupBetsRows}
           </TableBody>
         </Table>
         {/*table for users groups*/}
@@ -70,7 +74,7 @@ class ViewGroup extends Component {
             </TableRow>
           </TableHeader>
           <TableBody showRowHover={true}>
-            {groupMembers}
+            {groupMembersRows}
           </TableBody>
         </Table>
       </div>
@@ -80,7 +84,9 @@ class ViewGroup extends Component {
 
 const mapStateToProps = state => {
   return {
-    curGroupId: state.curGroupId
+    curGroupId: state.curGroupId,
+    groupMembers: state.groupMembers,
+    openGroupBets: state.openGroupBets
    }
 }
 export default connect(mapStateToProps)(ViewGroup)

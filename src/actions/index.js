@@ -15,6 +15,7 @@ export const actions = {
   FINISH_INVITE: 'FINISH_INVITE',
   VIEW_GROUP: 'VIEW_GROUP',
   CREATE_BET_PAGE: 'CREATE_BET_PAGE',
+  LOAD_BETS_LIST: 'LOAD_BETS_LIST',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -53,6 +54,21 @@ export const loadUsersGroups = (peerCoinInstance, account) => {
   }
 }
 
+export const loadUsersBets = (peerCoinInstance, account) => {
+  return dispatch => {
+    peerCoinInstance.listBets(account).then(function(result) {
+      console.log(result)
+      let betData = {
+        positions: result[0],
+        amount: String(result[1]).split(','),
+        id: result[2].map(i => window.web3.toAscii(i).replace(/\u0000/g, ''))
+      }
+      console.log(betData)
+      dispatch(saveLoadBetsList(betData))
+    })
+  }
+}
+
 export const inviteUsers = (peerCoinInstance, gid, userAddresses, accountNum, usersIndexList) => {
   return dispatch => {
     startInviting()
@@ -63,28 +79,28 @@ export const inviteUsers = (peerCoinInstance, gid, userAddresses, accountNum, us
     console.log('invite users:', accountNum)
     console.log('invite users:', userAddresses[usersIndexList[1]])
     console.log('invite users:', gid)
-    // usersIndexList.map((i) =>
-    //   {
-    //     console.log('mapping...', i)
-    //     console.log('mapping...', gid, userAddresses[i])
-    //     peerCoinInstance.inviteUser(gid, userAddresses[i]).then(function(result) {
-    //     if ((--totalLength) <= 0)
-    //       dispatch(finishInviting(gid)) // TODO :: left out because no need to over complicate things.
-    //     console.log('done with dispatch', (totalLength))
-    //   })}
-    // )
-    // peerCoinInstance.getbalance('a', userAddresses[0]).then(function(result) {
-    //   // dispatch(finishInviting(gid))
-    //   console.log(result, '----is the balance of user 2')
-    // })
-    peerCoinInstance.inviteUser('a', userAddresses[usersIndexList[0]], {from: userAddresses[accountNum], gas:3000000}).then(function(result) {
-      console.log(result, '----is the balance of user 2')
-      dispatch(finishInviting(gid))
-    })
-    console.log('after invite...')
+    usersIndexList.map((i) =>
+      {
+        console.log('mapping...', i)
+        console.log('mapping...', gid, userAddresses[i])
+        peerCoinInstance.inviteUser(gid, userAddresses[i], {from: userAddresses[accountNum], gas:3000000}).then(function(result) {
+        if ((--totalLength) <= 0)
+          dispatch(finishInviting(gid)) // TODO :: left out because no need to over complicate things.
+        console.log('done with dispatch', (totalLength))
+      })}
+    )
   }
 }
 
+export const loadOpenBets = (peerCoinInstance, gid) => {
+  return dispatch => {
+    // dispatch(viewGroup(gid))
+    peerCoinInstance.getGroupInfo(gid).then(function(result) {
+      console.log(result)
+      // dispatch(saveLoadBetsList(groupData))
+    })
+  }
+}
 export const loadGroupDetails = (peerCoinInstance, gid) => {
   return dispatch => {
     dispatch(viewGroup(gid))
@@ -101,7 +117,6 @@ export const loadGroupDetails = (peerCoinInstance, gid) => {
 }
 
 export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName, userAddresses, accountIndex) => {
-  console.log('heeere baby')
   return dispatch => {
     dispatch(startingCreateNewGroup())
     peerCoinInstance.createGroup(groupNameInput, groupId/*, tokenName*/, {from: userAddresses[accountIndex], gas:3000000}).then(function(result) {
@@ -114,6 +129,11 @@ export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName
 export const setAccountNum = (accountNum) => ({
   type: actions.SET_ACCOUNT_NUM,
   accountNum
+})
+
+export const saveLoadBetsList = (openBetsInfo) => ({
+  type: actions.LOAD_BETS_LIST,
+  openBetsInfo
 })
 
 // currently inactive...

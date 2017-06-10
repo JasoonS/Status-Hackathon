@@ -14,6 +14,7 @@ export const actions = {
   START_INVITE: 'START_INVITE',
   FINISH_INVITE: 'FINISH_INVITE',
   VIEW_GROUP: 'VIEW_GROUP',
+  CREATE_BET_PAGE: 'CREATE_BET_PAGE',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -156,6 +157,11 @@ export const finishCreateGroup = () => ({
 
 export const viewGroup = (curGroupId) => ({
   type: actions.VIEW_GROUP,
+  curGroupId
+})
+
+export const goToCreateBet = (curGroupId) => ({
+  type: actions.CREATE_BET_PAGE,
   curGroupId
 })
 

@@ -8,30 +8,44 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table'
+import { connect } from 'react-redux'
 import RaisedButton from 'material-ui/RaisedButton'
+import {loadGroupInvites, goToCreateBet} from '../actions'
 
-
-export default class ViewGroup extends Component {
+class ViewGroup extends Component {
+  constructor(props) {
+    super(props)
+  }
   render() {
+    const {
+      curGroupId,
+      dispatch
+    } = this.props
+    const inviteFriendsBtn = () => {
+      dispatch(loadGroupInvites(curGroupId, 'viewGroup'))
+    }
+    const createGroupBtn = () => {
+      dispatch(goToCreateBet(curGroupId))
+    }
     const openBets = ['a','b'].map((id, i) =>
-            <TableRow key={i} >
-              <TableRowColumn>{id}</TableRowColumn>
-              <TableRowColumn>{id}</TableRowColumn>
-            </TableRow>
-        )
+      <TableRow key={i} >
+        <TableRowColumn>{id}</TableRowColumn>
+        <TableRowColumn>{id}</TableRowColumn>
+      </TableRow>
+    )
     const groupMembers = ['mem1','mem2'].map((id, i) =>
-            <TableRow key={i} >
-              <TableRowColumn>{id}</TableRowColumn>
-              <TableRowColumn>{id}</TableRowColumn>
-            </TableRow>
-        )
+      <TableRow key={i} >
+        <TableRowColumn>{id}</TableRowColumn>
+        <TableRowColumn>{id}</TableRowColumn>
+      </TableRow>
+    )
     return (
       <div className="ViewGroup">
-        <h1>ViewGroup</h1>
-        <RaisedButton onTouchTap={() => console.log('inviteFriends')} label='Invite Friends' primary={true} fullWidth={true}/>
+        <h1>View Group @{curGroupId}</h1>
+        <RaisedButton onTouchTap={inviteFriendsBtn} label='Invite Friends' primary={true} fullWidth={true}/>
         <br />
         <br />
-        <RaisedButton onTouchTap={() => console.log('createBet')} label='Create Bet' primary={true} fullWidth={true}/>
+        <RaisedButton onTouchTap={createGroupBtn} label='Create Bet' primary={true} fullWidth={true}/>
         <br />
         <br />
         {/*table for active bets*/}
@@ -63,3 +77,10 @@ export default class ViewGroup extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    curGroupId: state.curGroupId
+   }
+}
+export default connect(mapStateToProps)(ViewGroup)

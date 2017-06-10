@@ -75,6 +75,12 @@ const reducer = (state = initialState, action) => {
         screen: 9,
         curGroupId: action.gid
       }
+    case actions.CREATE_BET_PAGE:
+      return {
+        ...state,
+        screen: 8,
+        curGroupId: action.gid
+      }
     default:
       return state
   }

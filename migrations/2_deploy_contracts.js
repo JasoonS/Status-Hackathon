@@ -34,9 +34,10 @@ module.exports = function(deployer) {
     peerCoin.sendToken("0xf15e7f2ba0476a8a1e76138245f6fd4ffaf04bb4", "a", 95)
     peerCoin.sendToken("0xf15e7F2bA0476A8a1e76138245f6Fd4FfaF04bB4", "b", 123)
     peerCoin.sendToken("0xf15e7F2bA0476A8a1e76138245f6Fd4FfaF04bB4", "c", 55)
-  }).then(()=>{
-    peerCoin.inviteUser('a', "0xf15e7f2ba0476a8a1e76138245f6fd4ffaf04bb4")
   })
+  // .then(()=>{
+  //   peerCoin.inviteUser('a', "0xf15e7f2ba0476a8a1e76138245f6fd4ffaf04bb4")
+  // })
 }
 //
 // var Registry = artifacts.require(“./Registry.sol”);

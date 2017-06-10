@@ -9,6 +9,16 @@ contract PeerCoin {
     int _balance
   );
 
+  modifier onlyGroupMember(bytes32 gid) {
+    if (!groups[gid].isMember[msg.sender]) {
+      throw;
+    }
+    _;
+  }
+
+  mapping (bytes32 => Group) public groups;
+  mapping (address => User) public users;
+
   struct Group {
     mapping (address => int) balances;
     mapping (address => bool) isMember; //test if person is a member of the group
@@ -19,6 +29,7 @@ contract PeerCoin {
     bytes32 name;
     bool exists;
   }
+
   struct GroupBets {
     mapping (address => Bet) bets;
     address[] participants;
@@ -54,78 +65,6 @@ contract PeerCoin {
     bool exists;
   }
 
-    function settleBet(bytes32 gid, bytes32 bgid, bool position){
-      require(groups[gid].groupBets[bgid].state == "voting");
-      require(groups[gid].groupBets[bgid].bets[msg.sender].exists);
-      require(!groups[gid].groupBets[bgid].voted[msg.sender]);
-
-      if(position){
-          groups[gid].groupBets[bgid].forVote++;
-      }else{
-          groups[gid].groupBets[bgid].againstVote++;
-      }
-      uint total = groups[gid].groupBets[bgid].participants.length;
-      uint amountToPayOut = 0;
-      if(groups[gid].groupBets[bgid].forVote > total/2){
-          //for vote wins
-          amountToPayOut = (groups[gid].groupBets[bgid].tokensFor + groups[gid].groupBets[bgid].tokensAgainst)/(groups[gid].groupBets[bgid].tokensFor/1000);
-          for(uint i = 0; i < groups[gid].groupBets[bgid].participants.length; i++){
-             if(groups[gid].groupBets[bgid].bets[groups[gid].groupBets[bgid].participants[i]].stance){
-                groups[gid].balances[groups[gid].groupBets[bgid].participants[i]] += int(amountToPayOut);
-             }
-         }
-       groups[gid].groupBets[bgid].state == "closed";
-      }else if(groups[gid].groupBets[bgid].againstVote > total/2){
-          //against vote wins
-          amountToPayOut = (groups[gid].groupBets[bgid].tokensAgainst + groups[gid].groupBets[bgid].tokensFor)/(groups[gid].groupBets[bgid].tokensAgainst/1000);
-          for(uint j = 0; j < groups[gid].groupBets[bgid].participants.length; j++){
-              if(!groups[gid].groupBets[bgid].bets[groups[gid].groupBets[bgid].participants[j]].stance){
-                    groups[gid].balances[groups[gid].groupBets[bgid].participants[j]] += int(amountToPayOut);
-              }
-          }
-          groups[gid].groupBets[bgid].state == "closed";
-
-      }else if(groups[gid].groupBets[bgid].againstVote + groups[gid].groupBets[bgid].forVote == total){
-          //it is a draw
-          for(uint k = 0; j < groups[gid].groupBets[bgid].participants.length; k++){
-                    groups[gid].balances[groups[gid].groupBets[bgid].participants[k]] += 1000;
-          }
-
-          groups[gid].groupBets[bgid].state == "closed";
-      }
-  }
-
-  modifier onlyGroupMember(bytes32 gid) {
-    if (!groups[gid].isMember[msg.sender]) {
-      throw;
-    }
-    _;
-  }
-
-  mapping (bytes32 => Group) public groups;
-  mapping (address => User) public users;
-
-   function listAllInvitiations(address addr) returns (bytes32[] invitations, bool[] pending){
-        uint length = users[addr].groupInvites.length;
-        invitations = new bytes32[](length);
-        pending = new bool[](length);
-        for(uint i = 0; i < length;i++){
-            invitations[i] = users[addr].groupInvites[i];
-            pending[i] = users[addr].pendingInvite[invitations[i]];
-        }
-        return (invitations,pending);
-  }
-
-
-    function listPendingInvites(address addr) returns (bytes32[] invitations){
-      invitations = new bytes32[](users[addr].numberOfPendingBets);
-      uint count = 0;
-      for(uint i = 0; i < users[addr].groupInvites.length; i++){
-          if(users[addr].pendingInvite[users[addr].groupInvites[i]]){
-            invitations[count++] = (users[addr].groupInvites[i]);
-          }
-      }
-  }
 
   function createGroup (bytes32 gname, bytes32 gid) returns (bool) {
     if(!groups[gid].exists) {
@@ -190,10 +129,6 @@ contract PeerCoin {
       groups[gid].groupBets[bgid].state = "voting";
   }
 
-  function isGroupIdUsed (bytes32 gid) constant returns( bool ) {
-    return groups[gid].exists;
-  }
-
   function addToUsersGroup (bytes32 gid) internal {
     //TODO: Add more checks and security here:
     // iterate through to check if pressent? Or check in the group itself if this user is referenced in members.
@@ -211,11 +146,77 @@ contract PeerCoin {
     // this append only, so not scalable if user joins many many groups.
   }
 
+    function settleBet(bytes32 gid, bytes32 bgid, bool position){
+      require(groups[gid].groupBets[bgid].state == "voting");
+      require(groups[gid].groupBets[bgid].bets[msg.sender].exists);
+      require(!groups[gid].groupBets[bgid].voted[msg.sender]);
+
+      if(position){
+          groups[gid].groupBets[bgid].forVote++;
+      }else{
+          groups[gid].groupBets[bgid].againstVote++;
+      }
+      uint total = groups[gid].groupBets[bgid].participants.length;
+      uint amountToPayOut = 0;
+      if(groups[gid].groupBets[bgid].forVote > total/2){
+          //for vote wins
+          amountToPayOut = (groups[gid].groupBets[bgid].tokensFor + groups[gid].groupBets[bgid].tokensAgainst)/(groups[gid].groupBets[bgid].tokensFor/1000);
+          for(uint i = 0; i < groups[gid].groupBets[bgid].participants.length; i++){
+             if(groups[gid].groupBets[bgid].bets[groups[gid].groupBets[bgid].participants[i]].stance){
+                groups[gid].balances[groups[gid].groupBets[bgid].participants[i]] += int(amountToPayOut);
+             }
+         }
+       groups[gid].groupBets[bgid].state == "closed";
+      }else if(groups[gid].groupBets[bgid].againstVote > total/2){
+          //against vote wins
+          amountToPayOut = (groups[gid].groupBets[bgid].tokensAgainst + groups[gid].groupBets[bgid].tokensFor)/(groups[gid].groupBets[bgid].tokensAgainst/1000);
+          for(uint j = 0; j < groups[gid].groupBets[bgid].participants.length; j++){
+              if(!groups[gid].groupBets[bgid].bets[groups[gid].groupBets[bgid].participants[j]].stance){
+                    groups[gid].balances[groups[gid].groupBets[bgid].participants[j]] += int(amountToPayOut);
+              }
+          }
+          groups[gid].groupBets[bgid].state == "closed";
+
+      }else if(groups[gid].groupBets[bgid].againstVote + groups[gid].groupBets[bgid].forVote == total){
+          //it is a draw
+          for(uint k = 0; j < groups[gid].groupBets[bgid].participants.length; k++){
+                    groups[gid].balances[groups[gid].groupBets[bgid].participants[k]] += 1000;
+          }
+
+          groups[gid].groupBets[bgid].state == "closed";
+      }
+  }
+
+    function listAllInvitiations(address addr) constant returns (bytes32[] invitations, bool[] pending){
+        uint length = users[addr].groupInvites.length;
+        invitations = new bytes32[](length);
+        pending = new bool[](length);
+        for(uint i = 0; i < length;i++){
+            invitations[i] = users[addr].groupInvites[i];
+            pending[i] = users[addr].pendingInvite[invitations[i]];
+        }
+        return (invitations,pending);
+  }
+
+  function listPendingInvites(address addr) constant returns (bytes32[] invitations){
+      invitations = new bytes32[](users[addr].numberOfPendingBets);
+      uint count = 0;
+      for(uint i = 0; i < users[addr].groupInvites.length; i++){
+          if(users[addr].pendingInvite[users[addr].groupInvites[i]]){
+            invitations[count++] = (users[addr].groupInvites[i]);
+          }
+      }
+  }
+
   function acceptInvite(bytes32 gid) {
     if (!groups[gid].isMember[msg.sender] && users[msg.sender].pendingInvite[gid]) { // TODO:: do exists check also
       users[msg.sender].pendingInvite[gid] = true;
       users[msg.sender].numberOfPendingBets--;
     }
+  }
+
+  function isGroupIdUsed (bytes32 gid) constant returns( bool ) {
+    return groups[gid].exists;
   }
 
   function listGroups(address uaddr) constant returns (bytes32[],bytes32[],int[]) {
@@ -241,18 +242,22 @@ contract PeerCoin {
     return (groupIds, groupNames,balances);
   }
 
-  function listBetsByGID(bytes32 gid) returns (bytes32[] groupBet) {
+  function listBetsByGID(bytes32 gid) constant returns (bytes32[] groupBet,uint[] forT, uint[] againstT) {
       Group group = groups[gid];
       groupBet = new bytes32[](group.groupBetsArray.length);
+      forT = new uint[](group.groupBetsArray.length);
+      againstT = new uint[](group.groupBetsArray.length);
       for(uint j = 0; j < group.groupBetsArray.length; j++){
             if(group.groupBets[group.groupBetsArray[j]].exists){
                 groupBet[j] = (group.groupBetsArray[j]);
+                forT[j] = group.groupBets[groupBet[j]].tokensFor;
+                againstT[j] = group.groupBets[groupBet[j]].tokensAgainst;
             }
 
         }
   }
 
-  function listMembers(bytes32 gid) returns (address[] memberID, int[] amount){
+  function listMembers(bytes32 gid) constant returns (address[] memberID, int[] amount){
       Group group = groups[gid];
       memberID = new address[](group.members.length);
       amount = new int[](group.members.length);
@@ -319,4 +324,5 @@ contract PeerCoin {
   function getSenderAddress() constant returns (address) {
       return msg.sender;
   }
+
 }

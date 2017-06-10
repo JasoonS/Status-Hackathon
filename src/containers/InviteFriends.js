@@ -39,13 +39,14 @@ class InveteFriends extends Component {
       screenContext,
       curGroupId,
       userAddresses,
+      accountNum,
       peerCoinInstance
     } = this.props
 
     let inviteFriends = (invites) => {
       console.log(invites)
       console.log(curGroupId)
-      this.props.dispatch(inviteUsers(peerCoinInstance, curGroupId, userAddresses, invites))
+      this.props.dispatch(inviteUsers(peerCoinInstance, curGroupId, userAddresses, accountNum, invites))
     }
 
     // TODO: add a filter, don't show your own address.
@@ -55,9 +56,7 @@ class InveteFriends extends Component {
               <TableRowColumn>{address}</TableRowColumn>
             </TableRow>
         )
-    userAddresses.map((address, i) =>
-            console.log(invites.indexOf(i) > -1)
-        )
+
     console.log('the screen context', screenContext)
     console.log('the screen context', userAddresses)
     return (
@@ -89,6 +88,7 @@ const mapStateToProps = state => {
     screenContext: state.screenContext,
     curGroupId: state.curGroupId,
     peerCoinInstance: state.peerCoinInstance,
+    accountNum: state.accountNum,
     userAddresses: state.userAddresses
    }
 }

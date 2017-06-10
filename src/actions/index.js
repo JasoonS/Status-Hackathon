@@ -53,12 +53,15 @@ export const loadUsersGroups = (peerCoinInstance, account) => {
   }
 }
 
-export const inviteUsers = (peerCoinInstance, gid, userAddresses, usersIndexList) => {
+export const inviteUsers = (peerCoinInstance, gid, userAddresses, accountNum, usersIndexList) => {
   return dispatch => {
     startInviting()
     let totalLength = usersIndexList.length
     console.log('invite users:', usersIndexList, totalLength)
     console.log('invite users:', userAddresses)
+    console.log('invite users:', usersIndexList)
+    console.log('invite users:', accountNum)
+    console.log('invite users:', userAddresses[usersIndexList[1]])
     console.log('invite users:', gid)
     // usersIndexList.map((i) =>
     //   {
@@ -70,14 +73,15 @@ export const inviteUsers = (peerCoinInstance, gid, userAddresses, usersIndexList
     //     console.log('done with dispatch', (totalLength))
     //   })}
     // )
-    peerCoinInstance.getbalance('a', userAddresses[0]).then(function(result) {
-      // dispatch(finishInviting(gid))
-      console.log(result, '----is the balance of user 2')
-    })
-    peerCoinInstance.inviteUser('a', userAddresses[3]).then(function(result) {
+    // peerCoinInstance.getbalance('a', userAddresses[0]).then(function(result) {
+    //   // dispatch(finishInviting(gid))
+    //   console.log(result, '----is the balance of user 2')
+    // })
+    peerCoinInstance.inviteUser('a', userAddresses[usersIndexList[0]], {from: userAddresses[accountNum], gas:3000000}).then(function(result) {
       console.log(result, '----is the balance of user 2')
       dispatch(finishInviting(gid))
     })
+    console.log('after invite...')
   }
 }
 
@@ -96,11 +100,11 @@ export const loadGroupDetails = (peerCoinInstance, gid) => {
   }
 }
 
-export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName, userAddress, accountIndex) => {
+export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName, userAddresses, accountIndex) => {
   console.log('heeere baby')
   return dispatch => {
     dispatch(startingCreateNewGroup())
-    peerCoinInstance.createGroup(groupNameInput, groupId/*, tokenName*/, {from: userAddress[0], gas:3000000}).then(function(result) {
+    peerCoinInstance.createGroup(groupNameInput, groupId/*, tokenName*/, {from: userAddresses[accountIndex], gas:3000000}).then(function(result) {
       dispatch(finishCreateGroup())
       dispatch(loadGroupInvites(groupId, 'createdGroup'))
     })

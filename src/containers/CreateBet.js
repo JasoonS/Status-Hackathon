@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux'
 
-export default class MyBets extends Component {
+class CreateBet extends Component {
   render() {
     return (
       <div className="CreateBet">
@@ -9,3 +10,10 @@ export default class MyBets extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    curGroupId: state.curGroupId
+   }
+}
+export default connect(mapStateToProps)(CreateBet)

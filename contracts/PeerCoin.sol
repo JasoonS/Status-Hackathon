@@ -93,12 +93,11 @@ contract PeerCoin {
     return (groups[gid].bets, groups[gid].members, balances);
   }
 
-  function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
+  function inviteUser (bytes32 gid, address newMember) /*onlyGroupMember(gid)*/ {
     users[newMember].groupInvites.push(gid);
     users[newMember].pendingInvite[gid] = true;
-    users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
-    // Rather store in a server, and check with the previous line if they have an account.
-    // this append only, so not scalable if user joins many many groups.
+    users[newMember].groupInvites.push(gid);
+    // this append only, so not scalable if user joins many many groups. But a first step in functionality.
   }
 
   function acceptInvite(bytes32 gid) {
@@ -137,8 +136,9 @@ contract PeerCoin {
     return groups[gid].balances[msg.sender];
   }
 
-  function getbalance(bytes32 gid) constant returns (int balance) {
-      return groups[gid].balances[msg.sender];
+  function getbalance(bytes32 gid, address userAdr) constant returns (int balance) {
+      return groups[gid].balances[userAdr];
+      /*return groups[gid].balances[msg.sender];*/
   }
 
   //for debugging:

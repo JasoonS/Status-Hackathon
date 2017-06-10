@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import { connect } from 'react-redux'
+import { inviteUsers } from '../actions'
+
 import {
   Table,
   TableBody,
@@ -16,11 +18,18 @@ class InveteFriends extends Component {
   constructor(props) {
     super(props)
 
-    // this.setGroupName = this.setGroupName.bind(this)
+    this.selectFriends = this.selectFriends.bind(this)
 
     this.state = {
       invites: []
     }
+  }
+  selectFriends(invites) {
+    console.log(this.state, invites)
+    this.setState({
+      ...this.state,
+      invites
+    })
   }
   render() {
     const {
@@ -29,25 +38,34 @@ class InveteFriends extends Component {
     const {
       screenContext,
       curGroupId,
-      userAddresses
+      userAddresses,
+      peerCoinInstance
     } = this.props
 
-    console.log('userAddresses')
-    console.log(userAddresses)
+    let inviteFriends = (invites) => {
+      console.log(invites)
+      console.log(curGroupId)
+      this.props.dispatch(inviteUsers(peerCoinInstance, curGroupId, userAddresses, invites))
+    }
+
     // TODO: add a filter, don't show your own address.
     const friends = userAddresses.map((address, i) =>
-          <TableRow key={i}>
-            <TableRowColumn>{i}</TableRowColumn>
-            <TableRowColumn>{address}</TableRowColumn>
-          </TableRow>
+            <TableRow key={i} selected={invites.indexOf(i) > -1} >
+              <TableRowColumn>{i}</TableRowColumn>
+              <TableRowColumn>{address}</TableRowColumn>
+            </TableRow>
+        )
+    userAddresses.map((address, i) =>
+            console.log(invites.indexOf(i) > -1)
         )
     console.log('the screen context', screenContext)
+    console.log('the screen context', userAddresses)
     return (
       <div className='InveteFriends'>
         <h1>Invite Friends</h1>
         {(screenContext === 'createdGroup') ? <p>You have just created a group, why not invite some friends to join, just enter their unique address.</p> : ''}
         <p>Invite friends to join your group: @{curGroupId}</p>
-        <Table height='300px' onRowSelection={(a) => console.log('selected row', a)} multiSelectable={true}>
+        <Table height='300px' onRowSelection={this.selectFriends} multiSelectable={true}>
           <TableHeader>
             <TableRow>
               <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
@@ -58,9 +76,11 @@ class InveteFriends extends Component {
             {friends}
           </TableBody>
         </Table>
-        <RaisedButton onClick={inviteFriends} label='Invite Selected Friends' primary={true} fullWidth={true}/>
+        {JSON.stringify(invites)}
+        <RaisedButton onTouchTap={() => inviteFriends(invites)} label='Invite Selected Friends' primary={true} fullWidth={true}/>
       </div>
     )
+    // <RaisedButton onClick={() => inviteFriends(invites)} label='Invite Selected Friends' primary={true} fullWidth={true}/>
   }
 }
 
@@ -68,6 +88,7 @@ const mapStateToProps = state => {
   return {
     screenContext: state.screenContext,
     curGroupId: state.curGroupId,
+    peerCoinInstance: state.peerCoinInstance,
     userAddresses: state.userAddresses
    }
 }

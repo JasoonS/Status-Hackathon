@@ -8,6 +8,7 @@ import CreateGroup from './containers/CreateGroup.js'
 import Home from './containers/Home.js'
 import MyGroups from './containers/MyGroups.js'
 import MyBets from './containers/MyBets.js'
+import ViewGroup from './containers/ViewGroup.js'
 import InviteFriends from './containers/InviteFriends.js'
 import SelectAccount from './containers/SelectAccount.js'
 import Tokens from './containers/Tokens.js'
@@ -70,6 +71,10 @@ class App extends Component {
               return <BotInstructions />
           else if(this.props.screen == 7)
               return <InviteFriends />
+          else if(this.props.screen == 8)
+              return <ViewGroup /> // TODO: change to
+          else if(this.props.screen == 9)
+              return <ViewGroup />
         } else {
           return <SelectAccount />
         }

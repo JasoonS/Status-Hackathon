@@ -62,6 +62,12 @@ const reducer = (state = initialState, action) => {
         curGroupId: action.groupID,
         screenContext: action.screenContext
       }
+    case actions.FINISH_INVITE:
+      return {
+        ...state,
+        screen: 9,
+        curGroupId: action.gid
+      }
     default:
       return state
   }

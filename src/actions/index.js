@@ -11,6 +11,8 @@ export const actions = {
   SAVE_USER_ADDRESS: 'SAVE_USER_ADDRESS',
   LOAD_GROUP_INVITE: 'LOAD_GROUP_INVITE',
   SET_ACCOUNT_NUM: 'SET_ACCOUNT_NUM',
+  START_INVITE: 'START_INVITE',
+  FINISH_INVITE: 'FINISH_INVITE',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -36,7 +38,7 @@ export const loadPeerCoinInstanceAndUserAddress = () => {
   }
 }
 
-export const loadUsersGroups = (peerCoinInstance,) => {
+export const loadUsersGroups = (peerCoinInstance) => {
   return dispatch => {
     peerCoinInstance.listGroups().then(function(result) {
       let groupData = {
@@ -45,6 +47,34 @@ export const loadUsersGroups = (peerCoinInstance,) => {
         groupBalance: String(result[2]).split(',')
       }
       dispatch(saveUsersGroups(groupData))
+    })
+  }
+}
+
+export const inviteUsers = (peerCoinInstance, gid, userAddresses, usersIndexList) => {
+  return dispatch => {
+    startInviting()
+    let totalLength = usersIndexList.length
+    console.log('invite users:', usersIndexList, totalLength)
+    console.log('invite users:', userAddresses)
+    console.log('invite users:', gid)
+    // usersIndexList.map((i) =>
+    //   {
+    //     console.log('mapping...', i)
+    //     console.log('mapping...', gid, userAddresses[i])
+    //     peerCoinInstance.inviteUser(gid, userAddresses[i]).then(function(result) {
+    //     if ((--totalLength) <= 0)
+    //       dispatch(finishInviting(gid)) // TODO :: left out because no need to over complicate things.
+    //     console.log('done with dispatch', (totalLength))
+    //   })}
+    // )
+    peerCoinInstance.getbalance('a', userAddresses[0]).then(function(result) {
+      // dispatch(finishInviting(gid))
+      console.log(result, '----is the balance of user 2')
+    })
+    peerCoinInstance.inviteUser('a', userAddresses[3]).then(function(result) {
+      console.log(result, '----is the balance of user 2')
+      dispatch(finishInviting(gid))
     })
   }
 }
@@ -77,6 +107,21 @@ export const setAccountNum = (accountNum) => ({
   type: actions.SET_ACCOUNT_NUM,
   accountNum
 })
+
+// currently inactive...
+export const startInviting = () => ({ // TODO: using a counter to tell when inviting is done is very hacky... Fix
+  type: actions.START_INVITE
+})
+
+export const finishInviting = (gid) => ({ // TODO: using a counter to tell when inviting is done is very hacky... Fix
+  type: actions.FINISH_INVITE,
+  gid
+})
+
+// export const inviteUser = (userAddresses) => ({ // TODO: using a counter to tell when inviting is done is very hacky... Fix
+//   type: actions.START_INVITE,
+//   userAddresses
+// })
 
 export const savePeerCoinInstance = (peerCoinInstance) => ({
   type: actions.SAVE_PEER_COIN,

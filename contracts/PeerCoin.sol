@@ -104,7 +104,8 @@ contract PeerCoin {
 
 
   function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
-
+      require(bamount == bamount);
+      // I do not like that this 1000 is hard coded but it has to be
       Group group = groups[gid]; //gets the group
       require(group.isMember[msg.sender]);
       require(group.groupBets[bgid].state == "voting");
@@ -115,7 +116,7 @@ contract PeerCoin {
       group.groupBets[bgid].bets[msg.sender].isOpen = true;
       group.groupBets[bgid].bets[msg.sender].exists = true;
       group.groupBets[bgid].participants.push(msg.sender);
-      group.balances[msg.sender] -= int(bamount);
+      group.balances[msg.sender] -= int(1000);
       if(bstance){
           group.groupBets[bgid].tokensFor += 1000;
       }else{
@@ -210,8 +211,10 @@ contract PeerCoin {
 
   function acceptInvite(bytes32 gid) {
     if (!groups[gid].isMember[msg.sender] && users[msg.sender].pendingInvite[gid]) { // TODO:: do exists check also
-      users[msg.sender].pendingInvite[gid] = true;
+      users[msg.sender].pendingInvite[gid] = false;
       users[msg.sender].numberOfPendingBets--;
+      groups[gid].members.push(msg.sender);
+      groups[gid].isMember[msg.sender] = true;
     }
   }
 

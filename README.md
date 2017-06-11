@@ -38,26 +38,33 @@ others: Victor, Jon Jon and Roy
 1. navigate to the correct directory and clone the repo.
 ```javascript
    git clone https://github.com/JasoonS/Status-Hackathon.git
-   cd Status-Hackathon```
+   cd Status-Hackathon
+   ```
 2. run npm-install to install dependencies
 ```javascript
-npm install```
+npm install
+```
 3. run testrpc in a seperate tab
 ```javascript
-testrpc --port 6546```
+testrpc --port 6546
+```
 4. This assumes that you have a device that you know the IP of as well as you have adb installed
 ```javascript
 adb reverse tcp:8546 tcp:8546
-   adb reverse tcp:3000 tcp:3000```
+   adb reverse tcp:3000 tcp:3000
+   ```
 5. switch node
 ```javascript
-status-dev-cli switch-node http://localhost:8546 --ip <DEVICE IP```  
+status-dev-cli switch-node http://localhost:8546 --ip <DEVICE IP
+```  
 6. run the commands to build to the device
 ```javascript
-status-dev-cli add --ip <DEVICE IP```
+status-dev-cli add --ip <DEVICE IP>
+```
 7. run npm
 ```javascript
-npm run start```
+npm run start
+```
 
 #### troubleshooting
 

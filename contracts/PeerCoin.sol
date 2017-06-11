@@ -60,7 +60,7 @@ contract PeerCoin {
     bytes32[] groups;
     bytes32[] groupBets;
     bytes32[] groupInvites;
-    uint numberOfPendingBets; //Ugly but it had to be done
+    uint numberOfPendingInvites; //Ugly but it had to be done
     mapping (bytes32 => bool) pendingInvite;
     bool exists;
   }
@@ -138,15 +138,6 @@ contract PeerCoin {
     groups[gid].isMember[msg.sender] = true;
   }
 
-  function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
-    // users[newMember].groupInvites.push(gid);
-    users[newMember].pendingInvite[gid] = true;
-    users[newMember].numberOfPendingBets++;
-    users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
-    // Rather store in a server, and check with the previous line if they have an account.
-    // this append only, so not scalable if user joins many many groups.
-  }
-
     function settleBet(bytes32 gid, bytes32 bgid, bool position){
       require(groups[gid].groupBets[bgid].state == "voting");
       require(groups[gid].groupBets[bgid].bets[msg.sender].exists);
@@ -200,7 +191,7 @@ contract PeerCoin {
   }
 
   function listPendingInvites(address addr) constant returns (bytes32[] invitations){
-      invitations = new bytes32[](users[addr].numberOfPendingBets);
+      invitations = new bytes32[](users[addr].numberOfPendingInvites);
       uint count = 0;
       for(uint i = 0; i < users[addr].groupInvites.length; i++){
           if(users[addr].pendingInvite[users[addr].groupInvites[i]]){
@@ -209,12 +200,22 @@ contract PeerCoin {
       }
   }
 
+    function inviteUser (bytes32 gid, address newMember) onlyGroupMember(gid) {
+        // users[newMember].groupInvites.push(gid);
+        users[newMember].pendingInvite[gid] = true;
+        users[newMember].numberOfPendingInvites++;
+        users[newMember].groupInvites.push(gid); // This should really be stored on a central server, not a good solution using an array like this.
+        // Rather store in a server, and check with the previous line if they have an account.
+        // this append only, so not scalable if user joins many many groups.
+  }
+
   function acceptInvite(bytes32 gid) {
     if (!groups[gid].isMember[msg.sender] && users[msg.sender].pendingInvite[gid]) { // TODO:: do exists check also
       users[msg.sender].pendingInvite[gid] = false;
-      users[msg.sender].numberOfPendingBets--;
       groups[gid].members.push(msg.sender);
       groups[gid].isMember[msg.sender] = true;
+      users[msg.sender].numberOfPendingInvites--;
+      users[msg.sender].groups.push(gid);
     }
   }
 
@@ -309,17 +310,6 @@ contract PeerCoin {
       }
       return (betsStance,betsAmount,gidName);
 
-  }
-
-  function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
-    uint length = groups[gid].members.length;
-    int[] memory balances = new int[](length);
-    for (uint i = 0; i < length; i++) {
-      address curMember = groups[gid].members[i];
-
-      balances[i] = groups[gid].balances[curMember];
-    }
-    return (groups[gid].bets, groups[gid].members, balances);
   }
 
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){

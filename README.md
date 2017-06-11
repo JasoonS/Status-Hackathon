@@ -7,9 +7,7 @@ Repo for the status hackathon
 
 ### Why we made this app
 
-It also started with the original idea BeerBot, in which people in a friend group could track how many beers they owed each other. we realised that this idea could be extended to use any token that the group could want as well as add functionality as people could bet on things. Friendly things. this app is intended to be used by families or close friends in order to keep track of minor debts that could otherwise hinder the growth of the friend group.
-
-Each group has its own zero sum token (some people have negative tokens and sum have positive; all summing up to 0). This functionality is pretty cool has coins will never need to minted or burnt in the traditional way but would rather be sent to the person that wins the bet when the betting period has expired.
+Bet bot is a decentralised betting app. Where users can create groups with friends and then use this in order to bet on 'trivial' things. The token system we are using is 0 sum, so some people have a negative balance of tokens and some have a positive. when all tokens in the system are added up the amount of tokens is 0. After a bet is settled I could have -5 tokens (the token type can be changed with each group by the user) and my friend could have 5. We could have decided to call our tokens beer tokens, and then someone with negative tokens can give someone with positive tokens -1 tokens and buy them a beer. thus I would have -4 tokens and my friend would have 4. This allows for a friendly way to manage your debts and all your previous bets. It also allows for additional functionallity, with the use case as if I go to a pub and forget my wallet. my friend could buy me some beers and I could give him 1 beer token for each beer he buys me. thus my balance would go to -2 and his would be 2. this would allow easy tracking of debts. All these use cases can be extended to any size group as long.
 
 **Use case one**
 

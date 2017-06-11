@@ -60,11 +60,11 @@ contract PeerCoin {
     bytes32[] groups;
     bytes32[] groupBets;
     bytes32[] groupInvites;
+    uint numberOfBets;
     uint numberOfPendingInvites; //Ugly but it had to be done
     mapping (bytes32 => bool) pendingInvite;
     bool exists;
   }
-
 
   address[] registeredUsers;
 
@@ -98,17 +98,6 @@ contract PeerCoin {
       return false;
     }
   }
-  
-    function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
-      uint length = groups[gid].members.length;
-      int[] memory balances = new int[](length);
-      for (uint i = 0; i < length; i++) {
-        address curMember = groups[gid].members[i];
-
-        balances[i] = groups[gid].balances[curMember];
-      }
-      return (groups[gid].bets, groups[gid].members, balances);
-    }
 
   function addBetGroup (bytes32 bgname, bytes32 bgdescription, bytes32 gid) returns( bool ){
     assert(groups[gid].exists);
@@ -125,6 +114,16 @@ contract PeerCoin {
     return true;
   }
 
+    function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
+      uint length = groups[gid].members.length;
+      int[] memory balances = new int[](length);
+      for (uint i = 0; i < length; i++) {
+        address curMember = groups[gid].members[i];
+
+        balances[i] = groups[gid].balances[curMember];
+      }
+      return (groups[gid].bets, groups[gid].members, balances);
+    }
 
   function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
       require(bamount == bamount);
@@ -140,6 +139,7 @@ contract PeerCoin {
       group.groupBets[bgid].bets[msg.sender].exists = true;
       group.groupBets[bgid].participants.push(msg.sender);
       group.balances[msg.sender] -= int(1000);
+      users[msg.sender].numberOfBets++;
       if(bstance){
           group.groupBets[bgid].tokensFor += 1000;
       }else{
@@ -313,25 +313,28 @@ contract PeerCoin {
       return  (groupBets,groupID,groupBetsDiscription);
   }
 
-  function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
-      uint length = users[uaddr].groupBets.length;
-      bool[] memory betsStance = new bool[](length);
-      uint[] memory betsAmount = new uint[](length);
-      bytes32[] memory gidName = new bytes32[](length);
+  function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs,bytes32[] gbetID, bytes32[] state) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
+      uint length = users[uaddr].numberOfBets;
+      stance = new bool[](length);
+      gbetID = new bytes32[](length);
+      amount = new uint[](length);
+      groupIDs = new bytes32[](length);
+      state = new bytes32[](length);
       var(groupIds , , ) = listGroups(uaddr);
       uint count = 0;
       for(uint i = 0; i < groupIds.length; i++){
           Group group = groups[groupIds[i]];
           for(uint j = 0; j < group.groupBetsArray.length; j++){
                 if(group.groupBets[group.groupBetsArray[j]].bets[uaddr].exists){
-                    betsStance[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].stance);
-                    betsAmount[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].amount);
-                    gidName[count++] = (group.groupBets[group.groupBetsArray[j]].name);
+                    stance[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].stance);
+                    amount[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].amount);
+                    groupIDs[count] = (group.groupBets[group.groupBetsArray[j]].name);
+                    state[count] = (group.groupBets[group.groupBetsArray[j]]).state;
+                    gbetID[count++] = (group.groupBetsArray[j]);
                 }
           }
-
       }
-      return (betsStance,betsAmount,gidName);
+      return (stance,amount,groupIDs,gbetID,state);
 
   }
 

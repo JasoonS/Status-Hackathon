@@ -37,7 +37,7 @@ class MyBets extends Component {
         <TableRowColumn>{openBetsInfo.amount[i]}</TableRowColumn>
       </TableRow>)
     )
-
+    console.log(openBetsInfo,openBets, 'open bets info')
     const loadBetDetailsBtn = (groupIndex) => {
       // const gid = groupData.groupIDs[groupIndex]
       console.log(groupIndex, 'was clicked')

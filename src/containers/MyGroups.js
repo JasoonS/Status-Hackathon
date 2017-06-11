@@ -90,8 +90,7 @@ class MyGroups extends Component {
               <TableRow>
                 <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
                 <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
-                <TableHeaderColumn tooltip="Your Balance in Group">Balance</TableHeaderColumn>
-                <TableHeaderColumn tooltip="View Group Details">View</TableHeaderColumn>
+                <TableHeaderColumn tooltip="Your Balance in Group">Balance (in mili tokens)</TableHeaderColumn>
               </TableRow>
             </TableHeader>
             <TableBody showRowHover={true} displayRowCheckbox={false}>

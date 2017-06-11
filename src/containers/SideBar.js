@@ -24,7 +24,6 @@ class SideBar extends Component {
         <a id="nth" onClick={() => this.props.setScreen(4)} className="menu-item" ><i className="fa fa-fw fa-star-o" /><span>Create Group</span></a>
         <a id="ntnth" onClick={() => this.props.setScreen(5)} className="menu-item" ><i className="fa fa-fw fa-star-o" /><span>Token Info</span></a>
         <a id="ntnth" onClick={() => this.props.setScreen(6)} className="menu-item" ><i className="fa fa-fw fa-star-o" /><span>Bot Instructions</span></a>
-        <a onClick={ this.showSettings } className="menu-item--small" href="">Settings</a>
       </Menu>
     )
   }

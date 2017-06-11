@@ -11,7 +11,10 @@ import MyBets from './containers/MyBets.js'
 import CreateBet from './containers/CreateBet.js'
 import ViewGroup from './containers/ViewGroup.js'
 import InviteFriends from './containers/InviteFriends.js'
+import CreateBetPosition from './containers/CreateBetPosition.js'
 import SelectAccount from './containers/SelectAccount.js'
+import Pay from './containers/Pay.js'
+import EditBet from './containers/EditBet.js'
 import Tokens from './containers/Tokens.js'
 import {loadPeerCoinInstanceAndUserAddress, setScreen, setAccountNum} from './actions'
 import PropTypes from 'prop-types'
@@ -76,6 +79,12 @@ class App extends Component {
               return <CreateBet />
           else if(this.props.screen == 9)
               return <ViewGroup />
+          else if(this.props.screen == 10)
+              return <CreateBetPosition />
+          else if(this.props.screen == 11)
+              return <Pay />
+          else if(this.props.screen == 12)
+              return <EditBet />
         } else {
           return <SelectAccount />
         }

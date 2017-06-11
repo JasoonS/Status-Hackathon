@@ -59,6 +59,14 @@ const reducer = (state = initialState, action) => {
         curGroupId: action.groupID,
         screenContext: action.screenContext
       }
+    case actions.GO_TO_PAYMENT_SCREEN:
+      return {
+        ...state,
+        screen: 11,
+        curGroupId: action.curGroupId,
+        toAddr: action.toAddr,
+        fromAddr: action.fromAddr,
+      }
     case actions.LOAD_BETS_LIST:
       return {
         ...state,
@@ -90,6 +98,18 @@ const reducer = (state = initialState, action) => {
         screen: 9,
         curGroupId: action.curGroupId,
       }
+    case actions.GIVE_BET_POS:
+      return {
+        ...state,
+        screen: 10,
+        curBid: action.curBid,
+        betDescription: action.betDescription,
+      }
+    case actions.CREATE_BET_DONE:
+      return {
+        ...state,
+        screen: 3,
+      }
     case actions.FINISH_INVITE:
       return {
         ...state,
@@ -100,7 +120,7 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         screen: 8,
-        curGroupId: action.gid
+        curGroupId: action.curGroupId
       }
     default:
       return state

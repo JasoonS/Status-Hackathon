@@ -10,11 +10,15 @@ import {
 } from 'material-ui/Table'
 import { connect } from 'react-redux'
 import RaisedButton from 'material-ui/RaisedButton'
-import {loadGroupInvites, goToCreateBet, loadGroupsBets, loadGroupInfo} from '../actions'
+import {loadGroupInvites, goToCreateBet, loadGroupsBets, loadGroupInfo, goToPaymentScreen} from '../actions'
 
 class ViewGroup extends Component {
   constructor(props) {
     super(props)
+
+    this.state= {
+      errorMessage: ''
+    }
   }
   componentWillMount () {
     this.props.dispatch(loadGroupsBets(this.props.peerCoinInstance, this.props.curGroupId))
@@ -27,13 +31,29 @@ class ViewGroup extends Component {
       openGroupBets,
       groupBetsInfo,
       dispatch,
-      groupInfo
+      groupInfo,
+      userAddresses,
+      accountNum
     } = this.props
+    const {
+      errorMessage
+    } = this.state
     const inviteFriendsBtn = () => {
       dispatch(loadGroupInvites(curGroupId, 'viewGroup'))
     }
     const createGroupBtn = () => {
       dispatch(goToCreateBet(curGroupId))
+    }
+    const payUser = (userRow) => {
+      // const index = groupMembers.indexOf()
+      if (groupMembers[userRow] === userAddresses[accountNum]) {
+        this.setState({
+          ...this.state,
+          errorMessage: 'you cannot pay yourself...'
+        })
+      } else {
+        dispatch(goToPaymentScreen(groupMembers[userRow], userAddresses[accountNum], curGroupId))
+      }
     }
     const openGroupBetsRows = openGroupBets.map((id, i) =>
       <TableRow key={i} >
@@ -69,7 +89,8 @@ class ViewGroup extends Component {
         </Table>
         {/*table for users groups*/}
         <h3>Group Members</h3>
-        <Table height='300px' onRowSelection={this.selectFriends}>
+        {(errorMessage === '')? '' : <p style={{color: 'red'}}>ERROR MESSAGE: you cannot pay yourself</p>}
+        <Table height='300px' onCellClick={(row) => payUser(row)}>
           <TableHeader displayRowCheckbox={false}>
             <TableRow>
               <TableHeaderColumn tooltip="User Address">User</TableHeaderColumn>
@@ -92,7 +113,9 @@ const mapStateToProps = state => {
     openGroupBets: state.openGroupBets,
     groupBetsInfo: state.groupBetsInfo,
     peerCoinInstance: state.peerCoinInstance,
-    groupInfo: state.groupInfo
+    groupInfo: state.groupInfo,
+    userAddresses: state.userAddresses,
+    accountNum: state.accountNum
    }
 }
 export default connect(mapStateToProps)(ViewGroup)

@@ -341,8 +341,6 @@ contract PeerCoin {
       }
       return (stance,amount,groupIDs,gbetID,state,groupNames);
 
-  }
-
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
     require(groups[gid].isMember[toAdr]);
     require(groups[gid].isMember[msg.sender]);

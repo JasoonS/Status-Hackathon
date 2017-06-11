@@ -20,6 +20,9 @@ export const actions = {
   LOAD_GBETS_LIST: 'LOAD_GBETS_LIST',
   LOAD_GROUP_INFO: 'LOAD_GROUP_INFO',
   LOAD_GINVITE_LIST: 'LOAD_GINVITE_LIST',
+  GIVE_BET_POS: 'GIVE_BET_POS',
+  GO_TO_PAYMENT_SCREEN: 'GO_TO_PAYMENT_SCREEN',
+  CREATE_BET_DONE: 'CREATE_BET_DONE',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -73,14 +76,17 @@ export const loadUsersInvites = (peerCoinInstance, account) => {
 
 export const loadUsersBets = (peerCoinInstance, account) => {
   return dispatch => {
+    // function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs,bytes32[] gbetID, bytes32[] state)
     peerCoinInstance.listBets(account).then(function(result) {
       console.log(result)
       let betData = {
         positions: result[0],
-        amount: String(result[1]).split(','),
-        id: result[2].map(i => window.web3.toAscii(i).replace(/\u0000/g, ''))
+        amount: result[1].map(i => math.divide(parseInt(String(i)),1000.0)),
+        id: result[2].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
+        gbid: result[3].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
+        state: result[4].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
       }
-      console.log(betData)
+      console.log('THIS IS THE BET DATA', betData)
       dispatch(saveLoadBetsList(betData))
     })
   }
@@ -130,7 +136,13 @@ export const inviteUsers = (peerCoinInstance, gid, userAddresses, accountNum, us
 export const accetpYourInvitation = (peerCoinInstance, gid, fromAddress) => {
   return dispatch => {
     peerCoinInstance.acceptInvite(gid, {from: fromAddress, gas:3000000}).then((result) => {
-      console.log(result)
+      // console.log(result)
+      dispatch(
+        loadUsersGroups(peerCoinInstance, fromAddress)
+      )
+      dispatch(
+        loadUsersInvites(peerCoinInstance, fromAddress)
+      )
     })
   }
 }
@@ -168,6 +180,56 @@ export const createGroup = (peerCoinInstance, groupNameInput, groupId, tokenName
     })
   }
 }
+
+export const createBet = (peerCoinInstance, betId, groupId, betDescription, userAddresses, accountIndex) => {
+  return dispatch => {
+    dispatch(startingCreateNewGroup())
+    // function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
+    // addBetGroup (bytes32 bgname, bytes32 bgdescription, bytes32 gid)
+    peerCoinInstance.addBetGroup(betId, betDescription, groupId, {from: userAddresses[accountIndex], gas:3000000}).then(function(result) {
+      // dispatch(finishCreateGroup())
+      dispatch(giveBetPossition(betId, betDescription))
+      console.log('create bet', result)
+    })
+  }
+}
+
+export const createBetPos = (peerCoinInstance, betId, groupId, bstance, userAddresses, accountIndex) => {
+  return dispatch => {
+    dispatch(startingCreateNewGroup())
+    // function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
+    peerCoinInstance.addBet(betId, groupId, bstance, 10000, {from: userAddresses[accountIndex], gas:3000000}).then(function(result) {
+      dispatch(createBetPossition())
+      console.log('create bet', result)
+    })
+  }
+}
+export const sendTokenPayment = (peerCoinInstance, toAdr, groupId, amount, userAddresses, accountIndex) => {
+  return dispatch => {
+    dispatch(startingCreateNewGroup())
+    // function addBet(bytes32 bgid, bytes32 gid, bool bstance, uint bamount) {
+    // sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
+    console.log(toAdr, groupId, parseInt(amount))
+    console.log(parseInt(amount))
+    peerCoinInstance.sendToken(toAdr, groupId, parseInt(amount), {from: userAddresses[accountIndex], gas:3000000}).then(function(result) {
+      dispatch(createBetPossition())
+      console.log('create bet', result)
+    })
+  }
+}
+
+export const goToPaymentScreen = (toAddr, fromAddr, curGroupId) => ({
+  type: actions.GO_TO_PAYMENT_SCREEN,
+  toAddr,
+  fromAddr,
+  curGroupId
+})
+
+export const giveBetPossition = (curBid, betDescription) => ({
+  type: actions.GIVE_BET_POS,
+  curBid,
+  betDescription
+})
 
 export const setAccountNum = (accountNum) => ({
   type: actions.SET_ACCOUNT_NUM,
@@ -245,6 +307,10 @@ export const viewGroup = (curGroupId) => ({
 export const goToCreateBet = (curGroupId) => ({
   type: actions.CREATE_BET_PAGE,
   curGroupId
+})
+
+export const createBetPossition = () => ({
+  type: actions.CREATE_BET_DONE
 })
 
 export const loadGroupInvites = (groupID, screenContext) =>{

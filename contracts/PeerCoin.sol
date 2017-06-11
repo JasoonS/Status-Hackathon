@@ -149,7 +149,7 @@ contract PeerCoin {
   }
 
   function changeState(bytes32 bgid, bytes32 gid){
-      assert(groups[gid].groupBets[bgid].creator == msg.sender);
+    //   assert(groups[gid].groupBets[bgid].creator == msg.sender); not beautiful but we didn't hsve time to implement this in the UI
       groups[gid].groupBets[bgid].state = "voting";
   }
 

@@ -103,13 +103,11 @@ export const loadGroupsBets = (peerCoinInstance, gid) => {
 export const loadGroupInfo = (peerCoinInstance, gid) => {
   return dispatch => {
     peerCoinInstance.getGroupInfo(gid).then(function(result) {
-      console.log(result)
       let betData = {
         // id: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, ''))
         address: result[1],
         balance: String(result[2]).split(',')
       }
-      console.log(betData)
       dispatch(saveGroupInfo(betData))
     })
   }
@@ -119,22 +117,21 @@ export const inviteUsers = (peerCoinInstance, gid, userAddresses, accountNum, us
   return dispatch => {
     startInviting()
     let totalLength = usersIndexList.length
-    console.log('invite users:', usersIndexList, totalLength)
-    console.log('invite users:', userAddresses)
-    console.log('invite users:', usersIndexList)
-    console.log('invite users:', accountNum)
-    console.log('invite users:', userAddresses[usersIndexList[1]])
-    console.log('invite users:', gid)
     usersIndexList.map((i) =>
       {
-        console.log('mapping...', i)
-        console.log('mapping...', gid, userAddresses[i])
         peerCoinInstance.inviteUser(gid, userAddresses[i], {from: userAddresses[accountNum], gas:3000000}).then(function(result) {
         if ((--totalLength) <= 0)
           dispatch(finishInviting(gid)) // TODO :: left out because no need to over complicate things.
-        console.log('done with dispatch', (totalLength))
       })}
     )
+  }
+}
+
+export const accetpYourInvitation = (peerCoinInstance, gid, fromAddress) => {
+  return dispatch => {
+    peerCoinInstance.acceptInvite(gid, {from: fromAddress, gas:3000000}).then((result) => {
+      console.log(result)
+    })
   }
 }
 

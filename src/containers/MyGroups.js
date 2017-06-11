@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {loadUsersGroups, loadGroupDetails, loadUsersInvites} from '../actions'
+import {loadUsersGroups, loadGroupDetails, loadUsersInvites, accetpYourInvitation} from '../actions'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
@@ -34,7 +34,9 @@ class MyGroups extends Component {
       dispatch,
       peerCoinInstance,
       yourInvites,
-      groupInvitesInfo
+      groupInvitesInfo,
+      userAddresses,
+      accountNum,
     } = this.props
     console.log('groupData!!!!', groupData)
     const groups = () => {
@@ -54,11 +56,11 @@ class MyGroups extends Component {
       }
     }
     console.log(groupInvitesInfo, yourInvites, 'invite stuff...')
-    const invites =  yourInvites.map((invFrom, i) =>
+    const invites =  yourInvites.map((gID, i) =>
           <TableRow key={i}>
-            <TableRowColumn>{invFrom}</TableRowColumn>
+            <TableRowColumn>{gID}</TableRowColumn>
             <TableRowColumn>{groupInvitesInfo.invStatus[i]? 'pending': 'accepted'}</TableRowColumn>
-            <TableRowColumn><RaisedButton label="Primary" primary={true} onTouchTap={() => console.log('accpet invite for:', invFrom)} /></TableRowColumn>
+            <TableRowColumn><RaisedButton label="Primary" primary={true} onTouchTap={() => dispatch(accetpYourInvitation(peerCoinInstance,gID,userAddresses[accountNum]))} /></TableRowColumn>
           </TableRow>
         )
     const loadGroupDetailsBtn = (groupIndex) => {
@@ -112,7 +114,9 @@ const mapStateToProps = state => {
     accountNum: state.accountNum,
     yourInvites: state.yourInvites,
     groupInvitesInfo: state.groupInvitesInfo,
-    groupData: state.groupData
+    groupData: state.groupData,
+    accountNum: state.accountNum,
+    userAddresses: state.userAddresses
    }
 }
 

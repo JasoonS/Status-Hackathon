@@ -32,9 +32,12 @@ module.exports = function(deployer) {
     instance.createGroup("bname", "b")
     .then(() =>
       instance.addBetGroup('b-bet', 'can I code this in 5 hours?', 'b')
-      .then(() =>
+      .then(() =>{
         instance.addBet('b-bet', 'b', true, 12)
-      )
+        instance.inviteUser('b', '0x9ea4ea9f20bdffa9b65c552b1a3d82d00d4a4406').then(()=> {
+          instance.inviteUser('b',  {from: '0x9ea4ea9f20bdffa9b65c552b1a3d82d00d4a4406', gas:3000000})
+        })
+      })
     )
     instance.createGroup("cname", "c")
     .then(() =>
@@ -46,9 +49,10 @@ module.exports = function(deployer) {
     instance.createGroup("dname", "d")
     .then(() =>
       instance.addBetGroup('d-bet', 'can I code this in 5 hours?', 'd')
-      .then(() =>
+      .then(() => {
         instance.addBet('d-bet', 'd', true, 12)
-      )
+        instance.inviteUser('d', '0x9ea4ea9f20bdffa9b65c552b1a3d82d00d4a4406')
+      })
     )
     // (bytes32 bgname, bytes32 bgdescription, bytes32 gid)
     // (bytes32 bgid, bytes32 gid, bool bstance, uint bamount)

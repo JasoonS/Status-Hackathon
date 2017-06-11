@@ -1,6 +1,7 @@
 import PeerCoinContract from '../../build/contracts/PeerCoin.json'
 import Config from '../../truffle.js'
 import Web3 from 'web3'
+var math = require('mathjs')
 
 export const actions = {
   CUSTOM_ACTION: 'CUSTOM_ACTION',
@@ -75,8 +76,11 @@ export const loadGroupsBets = (peerCoinInstance, gid) => {
   return dispatch => {
     peerCoinInstance.listBetsByGID(gid).then(function(result) {
       let betData = {
-        id: result/*[0]*/.map(i => window.web3.toAscii(i).replace(/\u0000/g, ''))
+        id: result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
+        for: result[1].map(i => math.divide(parseInt(String(i)),1000.0)),
+        against: result[2].map(i => math.divide(parseInt(String(i)),1000.0))
       }
+      console.log(betData)
       dispatch(saveGroupBetsList(betData))
     })
   }

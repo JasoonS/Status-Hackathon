@@ -53,6 +53,7 @@
   "dependencies": {
     "dotenv": "^2.0.0",
     "material-ui": "^0.18.2",
+    "mathjs": "^3.13.3",
     "react": "^15.5.4",
     "react-bootstrap": "^0.31.0",
     "react-burger-menu": "^2.0.2",

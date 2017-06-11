@@ -38,7 +38,7 @@ class ViewGroup extends Component {
     const openGroupBetsRows = openGroupBets.map((id, i) =>
       <TableRow key={i} >
         <TableRowColumn>{id}</TableRowColumn>
-        <TableRowColumn>{groupBetsInfo.id[i]}</TableRowColumn>
+        <TableRowColumn>{groupBetsInfo.for[i] + '/' + groupBetsInfo.against[i]}</TableRowColumn>
       </TableRow>
     )
     const groupMembersRows = groupMembers.map((id, i) =>
@@ -59,8 +59,8 @@ class ViewGroup extends Component {
         <Table onRowSelection={this.selectFriends}>
           <TableHeader displayRowCheckbox={false}>
             <TableRow>
-              <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Friend Address">Friend Address</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Bet ID">Bet ID</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The For/Against Odds">For/Against</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody showRowHover={true} displayRowCheckbox={false}>

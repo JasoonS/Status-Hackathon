@@ -75,7 +75,6 @@ class InveteFriends extends Component {
             {friends}
           </TableBody>
         </Table>
-        {JSON.stringify(invites)}
         <RaisedButton onTouchTap={() => inviteFriends(invites)} label='Invite Selected Friends' primary={true} fullWidth={true}/>
       </div>
     )

@@ -308,6 +308,17 @@ contract PeerCoin {
 
   }
 
+  function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
+    uint length = groups[gid].members.length; 
+    int[] memory balances = new int[](length);
+    for (uint i = 0; i < length; i++) {
+      address curMember = groups[gid].members[i];
+
+      balances[i] = groups[gid].balances[curMember];
+    }
+    return (groups[gid].bets, groups[gid].members, balances);
+  }
+
   function sendToken(address toAdr, bytes32 gid, uint amount) returns (int balance){
     require(groups[gid].isMember[toAdr]);
     require(groups[gid].isMember[msg.sender]);

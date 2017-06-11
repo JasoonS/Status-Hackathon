@@ -294,10 +294,11 @@ contract PeerCoin {
         }
   }
 
-  function listGroupBets(address uaddr) constant returns(bytes32[] groupBets, bytes32[] groupID, bytes32[] groupBetsDiscription){
+  function listGroupBets(address uaddr) constant returns(bytes32[] groupBets, bytes32[] groupID, bytes32[] groupBetsDiscription, bytes32[] state){
       groupBets = new bytes32[](users[msg.sender].groupBets.length);
       groupID = new bytes32[](users[msg.sender].groupBets.length);
       groupBetsDiscription  = new bytes32[](users[msg.sender].groupBets.length);
+      state =  new bytes32[](users[msg.sender].groupBets.length);
       var(groupIds , , ) = listGroups(uaddr);
       for(uint i = 0; i < groupIds.length; i++){
           Group group = groups[groupIds[i]];
@@ -306,11 +307,12 @@ contract PeerCoin {
                     groupBets[i*j] = (group.groupBetsArray[j]);
                     groupID[i*j] = (group.name);
                     groupBetsDiscription[i*j] = (group.groupBets[group.groupBetsArray[j]].description);
+                    state[i*j] = (group.groupBets[group.groupBetsArray[j]].state);
                 }
           }
 
       }
-      return  (groupBets,groupID,groupBetsDiscription);
+      return  (groupBets,groupID,groupBetsDiscription,state);
   }
 
   function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs,bytes32[] gbetID, bytes32[] state) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too

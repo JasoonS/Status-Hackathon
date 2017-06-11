@@ -19,6 +19,7 @@ export const actions = {
   LOAD_BETS_LIST: 'LOAD_BETS_LIST',
   LOAD_GBETS_LIST: 'LOAD_GBETS_LIST',
   LOAD_GROUP_INFO: 'LOAD_GROUP_INFO',
+  LOAD_GINVITE_LIST: 'LOAD_GINVITE_LIST',
   CREATED_GROUP: 'CREATED_GROUP'
 };
 
@@ -53,6 +54,19 @@ export const loadUsersGroups = (peerCoinInstance, account) => {
         groupBalance: String(result[2]).split(',')
       }
       dispatch(saveUsersGroups(groupData))
+    })
+  }
+}
+
+export const loadUsersInvites = (peerCoinInstance, account) => {
+  return dispatch => {
+    peerCoinInstance.listAllInvitiations(account).then(function(result) {
+      console.log('invites<', result)
+      let inviteData = {
+        groupId:  result[0].map(i => window.web3.toAscii(i).replace(/\u0000/g, '')),
+        invStatus: result[1]
+      }
+      dispatch(saveUsersInvites(inviteData))
     })
   }
 }
@@ -171,6 +185,11 @@ export const saveLoadBetsList = (openBetsInfo) => ({
 export const saveGroupInfo = (groupInfo) => ({
   type: actions.LOAD_GROUP_INFO,
   groupInfo
+})
+
+export const saveUsersInvites = (groupInvitesInfo) => ({
+  type: actions.LOAD_GINVITE_LIST,
+  groupInvitesInfo
 })
 
 export const saveGroupBetsList = (groupBetsInfo) => ({

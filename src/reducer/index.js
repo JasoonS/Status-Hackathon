@@ -8,8 +8,8 @@ const initialState = {
   screen: 3,
   openBets: [],
   openGroupBets: [],
-  groupMembers: []
-  // yourBets: []
+  groupMembers: [],
+  yourInvites: []
 }
 
 const reducer = (state = initialState, action) => {
@@ -64,6 +64,12 @@ const reducer = (state = initialState, action) => {
         ...state,
         openBets: action.openBetsInfo.id,
         openBetsInfo: action.openBetsInfo
+      }
+    case actions.LOAD_GINVITE_LIST:
+      return {
+        ...state,
+        yourInvites: action.groupInvitesInfo.groupId,
+        groupInvitesInfo: action.groupInvitesInfo
       }
     case actions.LOAD_GBETS_LIST:
       console.log('LOAD_GBETS_LIST', action)

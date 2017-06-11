@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {loadUsersGroups, loadGroupDetails} from '../actions'
+import {loadUsersGroups, loadGroupDetails, loadUsersInvites} from '../actions'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import {
@@ -23,16 +23,23 @@ class MyGroups extends Component {
     this.props.dispatch(
       loadUsersGroups(this.props.peerCoinInstance, this.props.userAddresses[this.props.accountNum])
     )
+    this.props.dispatch(
+      loadUsersInvites(this.props.peerCoinInstance, this.props.userAddresses[this.props.accountNum])
+    )
   }
 
   render() {
     const {
       groupData,
       dispatch,
-      peerCoinInstance
+      peerCoinInstance,
+      yourInvites,
+      groupInvitesInfo
     } = this.props
+    console.log('groupData!!!!', groupData)
     const groups = () => {
       if (this.props.groupDataLoaded){
+        // TODO: fix the headings.
         // const {groupData: {groupIDs, groupNames, groupBalance}} = this.props.groupData
         return this.props.groupData.groupIDs.map((gID, i) =>
           <TableRow key={i}>
@@ -46,6 +53,14 @@ class MyGroups extends Component {
         return ''
       }
     }
+    console.log(groupInvitesInfo, yourInvites, 'invite stuff...')
+    const invites =  yourInvites.map((invFrom, i) =>
+          <TableRow key={i}>
+            <TableRowColumn>{invFrom}</TableRowColumn>
+            <TableRowColumn>{groupInvitesInfo.invStatus[i]? 'pending': 'accepted'}</TableRowColumn>
+            <TableRowColumn><RaisedButton label="Primary" primary={true} onTouchTap={() => console.log('accpet invite for:', invFrom)} /></TableRowColumn>
+          </TableRow>
+        )
     const loadGroupDetailsBtn = (groupIndex) => {
       const gid = groupData.groupIDs[groupIndex]
       console.log(gid, 'is the group id')
@@ -56,10 +71,22 @@ class MyGroups extends Component {
         <h1>My Groups</h1>
         <p>The following are groups you belong to as well as group invites.</p>
         <div>
-        <Table height='300px' onCellClick={(row) => loadGroupDetailsBtn(row)}>
-            <TableHeader>
+          <Table onCellClick={(row) => console.log(row)}>
+            <TableHeader displayRowCheckbox={false}>
               <TableRow>
-              <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
+                <TableHeaderColumn tooltip="Group Name">Group Name</TableHeaderColumn>
+                <TableHeaderColumn tooltip="The Status">Status</TableHeaderColumn>
+                <TableHeaderColumn tooltip="The Action you can perform on this group.">Action</TableHeaderColumn>
+              </TableRow>
+            </TableHeader>
+            <TableBody showRowHover={true} displayRowCheckbox={false}>
+              {invites}
+            </TableBody>
+          </Table>
+          <Table height='300px' onCellClick={(row) => loadGroupDetailsBtn(row)}>
+            <TableHeader displayRowCheckbox={false}>
+              <TableRow>
+                <TableHeaderColumn tooltip="The Group ID">ID</TableHeaderColumn>
                 <TableHeaderColumn tooltip="The Name">Name</TableHeaderColumn>
                 <TableHeaderColumn tooltip="Your Balance in Group">Balance</TableHeaderColumn>
                 <TableHeaderColumn tooltip="View Group Details">View</TableHeaderColumn>
@@ -83,6 +110,8 @@ const mapStateToProps = state => {
     groupDataLoaded: state.groupDataLoaded,
     userAddresses: state.userAddresses,
     accountNum: state.accountNum,
+    yourInvites: state.yourInvites,
+    groupInvitesInfo: state.groupInvitesInfo,
     groupData: state.groupData
    }
 }

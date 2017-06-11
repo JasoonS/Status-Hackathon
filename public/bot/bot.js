@@ -1,7 +1,7 @@
 
 
 status.addListener("init", function () {
-  return {"text-message": "Welcome to Genesis Token Tracker. ʕ•͡ᴥ•ʔ"};
+  return {"text-message": "Welcome to BetBot!"};
 });
 
 var usersIndex = 0
@@ -131,23 +131,6 @@ status.command({
     fullscreen: true,
     onSend: function(params){
       return browse(9, params)
-    }
-});
-
-status.command({
-    name: "your_eth",
-    title: 'Your Ether',
-    description: 'Check how much you spent/earnt ether',
-    fullscreen: true,
-    params: [
-      {
-          name: "account",
-          type: status.types.TEXT,
-          placeholder: "SGT holding account address"
-      }
-    ],
-    onSend: function(params){
-      return browse('eth_line', params)
     }
 });
 

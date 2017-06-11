@@ -22,18 +22,41 @@ Each group has its own zero sum token (some people have negative tokens and sum 
 ### Who are we?
 
 **Jason**
-Honours student at UCT. pretty darn cool. (github.com/Jasoon)
+Honours student at UCT. pretty darn cool. (@JasoonS)
 
 **Cary**
-3rd year student at UCT. bad at coding (github.com/yepster1)
+3rd year student at UCT. bad at coding (@yepster1)
 
 **Brendan**
-awesome venture capitalist guy who helped with design, and pushed the ideas forward.(github.com/chateaux)
+awesome venture capitalist guy who helped with design, and pushed the ideas forward.(@chateaux)
 
-Rest of team: Victor, Jon Jon and Roy were all faders.
+others: Victor, Jon Jon and Roy
 ### Instruction for use
 
-- normal running I guess, should be intuitive once you get it going
+#### notes for building yourself
+
+1. navigate to the correct directory and clone the repo.
+'''git clone https://github.com/JasoonS/Status-Hackathon.git
+   cd Status-Hackathon'''
+2. run npm-install to install dependencies
+'''npm install'''
+3. run testrpc in a seperate tab
+'''testrpc --port 6546'''
+4. This assumes that you have a device that you know the IP of as well as you have adb installed
+'''adb reverse tcp:8546 tcp:8546
+   adb reverse tcp:3000 tcp:3000'''
+5. switch node
+'''status-dev-cli switch-node http://localhost:8546 --ip <DEVICE IP>'''  
+6. run the commands to build to the device
+'''status-dev-cli add --ip <DEVICE IP>'''
+7. run npm
+'''npm run start'''
+
+#### troubleshooting
+
+1. we noticed that you occasinally need to restart debug mode as well as restart the app.
+2. you might need to watch the directory
+'''status-dev-cli watch --ip <DEVICE IP>
 
 ### Our challenges
 - We originally had a lot of trouble with getting status to update after making a change to the code.
@@ -41,9 +64,3 @@ Rest of team: Victor, Jon Jon and Roy were all faders.
 - Once we got started using the API properly the development was not particularly bad considering it is still in its early stages.
 - Solidity was an issue and getting it implemented inside of status. this was fixed after we were told of cool tools such as (browser tool)
 - We had never done any large scale projects in ethereum or made an actual dapp more than just a simple token creator so learning all that was also a huge challenge!
-
-### TODO:
-
-- send token functionality
-- settle bets
-- create bets

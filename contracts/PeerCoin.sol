@@ -66,6 +66,18 @@ contract PeerCoin {
   }
 
 
+  address[] registeredUsers;
+
+  function registerUser() {
+      if(!users[msg.sender].exists){
+          registeredUsers.push(msg.sender);
+      }
+  }
+
+  function listRegisteredUsers() returns (address[] addr){
+        return registeredUsers;
+  }
+
   function createGroup (bytes32 gname, bytes32 gid) returns (bool) {
     if(!groups[gid].exists) {
       //create group
@@ -86,6 +98,17 @@ contract PeerCoin {
       return false;
     }
   }
+  
+    function getGroupInfo (bytes32 gid) constant returns (bytes32[] _bets, address[] _members, int[] _balances){
+      uint length = groups[gid].members.length;
+      int[] memory balances = new int[](length);
+      for (uint i = 0; i < length; i++) {
+        address curMember = groups[gid].members[i];
+
+        balances[i] = groups[gid].balances[curMember];
+      }
+      return (groups[gid].bets, groups[gid].members, balances);
+    }
 
   function addBetGroup (bytes32 bgname, bytes32 bgdescription, bytes32 gid) returns( bool ){
     assert(groups[gid].exists);

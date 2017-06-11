@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "dotenv": "^2.0.0",
+    "gh-pages": "^1.0.0",
     "material-ui": "^0.18.2",
     "mathjs": "^3.13.3",
     "react": "^15.5.4",

@@ -27,6 +27,7 @@ contract PeerCoin {
     bytes32[] groupBetsArray;
     bytes32[] bets;
     bytes32 name;
+    bytes32 id;
     bool exists;
   }
 
@@ -85,7 +86,7 @@ contract PeerCoin {
 
       newGroup.name = gname;
       newGroup.exists = true;
-
+      newGroup.id = gid;
       groups[gid] = newGroup;
       groups[gid].members.push(msg.sender);
       groups[gid].isMember[msg.sender] = true;
@@ -315,13 +316,14 @@ contract PeerCoin {
       return  (groupBets,groupID,groupBetsDiscription,state);
   }
 
-  function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs,bytes32[] gbetID, bytes32[] state) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
+  function listBets(address uaddr) constant returns (bool[] stance ,uint[] amount ,bytes32[] groupIDs,bytes32[] gbetID, bytes32[] state,bytes32[] groupNames) { //returns an array of bets name as well as a corrosponding array of groupbets that the bet belongs too
       uint length = users[uaddr].numberOfBets;
       stance = new bool[](length);
       gbetID = new bytes32[](length);
       amount = new uint[](length);
       groupIDs = new bytes32[](length);
       state = new bytes32[](length);
+      groupNames = new bytes32[](length);
       var(groupIds , , ) = listGroups(uaddr);
       uint count = 0;
       for(uint i = 0; i < groupIds.length; i++){
@@ -330,13 +332,14 @@ contract PeerCoin {
                 if(group.groupBets[group.groupBetsArray[j]].bets[uaddr].exists){
                     stance[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].stance);
                     amount[count] = (group.groupBets[group.groupBetsArray[j]].bets[uaddr].amount);
-                    groupIDs[count] = (group.groupBets[group.groupBetsArray[j]].name);
+                    groupIDs[count] = (group.id);
                     state[count] = (group.groupBets[group.groupBetsArray[j]]).state;
-                    gbetID[count++] = (group.groupBetsArray[j]);
+                    gbetID[count] = (group.groupBetsArray[j]);
+                    groupNames[count++] = group.name;
                 }
           }
       }
-      return (stance,amount,groupIDs,gbetID,state);
+      return (stance,amount,groupIDs,gbetID,state,groupNames);
 
   }
 
